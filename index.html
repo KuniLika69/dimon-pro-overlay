@@ -133,6 +133,20 @@
   @keyframes pop  { from { transform: scale(0) rotate(-30deg); opacity: 0; } to { transform: scale(1) rotate(-6deg); opacity: 1; } }
   @keyframes wob  { 50% { translate: 0 -10px; } }
 
+  /* GPT с крыльями */
+  #dsWings { background: linear-gradient(#6ec6ff, #e3f6ff); overflow: hidden; }
+  .wg { position: absolute; font: clamp(28px, 4.2vw, 90px) Impact, sans-serif; color: #fff; text-shadow: 0 0 16px #ffd54a, 3px 3px 0 #b8860b;
+        display: flex; align-items: center; animation: flyup linear infinite; }
+  .wg i { display: block; width: 1.3em; height: .7em; background: #fff; border: 3px solid #cfd8dc; border-radius: 100% 0 100% 0; animation: flap .25s ease-in-out infinite alternate; }
+  .wg i:first-child { transform-origin: right center; border-radius: 0 100% 0 100%; }
+  .wg i:last-child { transform-origin: left center; }
+  @keyframes flap { from { transform: rotate(25deg) scaleY(.6); } to { transform: rotate(-25deg) scaleY(1.1); } }
+  .wg i:last-child { animation-name: flapR; }
+  @keyframes flapR { from { transform: rotate(-25deg) scaleY(.6); } to { transform: rotate(25deg) scaleY(1.1); } }
+  @keyframes flyup { from { transform: translateY(110vh) rotate(-6deg); } to { transform: translateY(-30vh) rotate(6deg); } }
+  #wgTitle { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; font: clamp(50px, 9vw, 190px)/1 Impact, sans-serif;
+             color: #fff; text-shadow: 0 0 30px #ffd54a, 6px 6px 0 #b8860b; animation: slam .6s cubic-bezier(.2,1.6,.4,1) both; z-index: 2; }
+
   /* Димвроди: телефон и финал */
   #mmPhone { background: rgba(8,8,14,.94); }
   #mmPhone.on { display: flex; align-items: center; justify-content: center; }
@@ -513,6 +527,43 @@
       </g>
     </svg>
   </div>
+
+  <!-- ===== ВАРИАНТ 11: агенты DeepSeek и СОЛ 6.999 ===== -->
+  <div class="phase" id="ds">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block">
+      <defs>
+        <radialGradient id="solG"><stop offset="0" stop-color="#fffbe0"/><stop offset=".55" stop-color="#ffcc33"/><stop offset="1" stop-color="#ff7a00"/></radialGradient>
+        <linearGradient id="dsSkyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6ec6ff"/><stop offset="1" stop-color="#e3f6ff"/></linearGradient>
+        <linearGradient id="beamG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff59d" stop-opacity=".95"/><stop offset="1" stop-color="#fff59d" stop-opacity=".25"/></linearGradient>
+      </defs>
+      <g id="dsLair">
+        <rect width="1920" height="1080" fill="#050b1f"/>
+        <g opacity=".25">${""}</g>
+        <rect x="560" y="40" width="800" height="230" rx="16" fill="#000" stroke="#4d6bfe" stroke-width="6"/>
+        <text x="600" y="100" font-size="38" font-family="Consolas, monospace" font-weight="900" fill="#4d6bfe">ПОИСК: ДИМОН GPT PRO</text>
+        <text id="dsStatus" x="600" y="160" font-size="38" font-family="Consolas, monospace" font-weight="900" fill="#ff3b3b">СТАТУС: БЕЗЛИМИТНЫЙ ⚠</text>
+        <text id="dsHack" x="600" y="220" font-size="38" font-family="Consolas, monospace" font-weight="900" fill="#7dffb0">ВЗЛОМ: 0%</text>
+        <rect id="dsScan" x="560" y="40" width="800" height="8" fill="#4d6bfe" opacity=".7"/>
+        <g id="dsCaptive" transform="translate(960,1010)"></g>
+        <g id="dsAgents"></g>
+        <polygon id="dsBeam" points="860,0 1060,0 1160,1010 760,1010" fill="url(#beamG)" opacity="0"/>
+        <g id="dsSol" transform="translate(960,-300)"></g>
+        <g id="dsBubs"></g>
+      </g>
+      <g id="dsSky" display="none">
+        <rect width="1920" height="1080" fill="url(#dsSkyG)"/>
+        <g id="dsClouds"></g>
+        <g id="dsSkyDima" transform="translate(720,900)"></g>
+        <g id="dsSol2" transform="translate(1250,520)"></g>
+        <g id="dsSkyBub" opacity="0">
+          <rect x="900" y="80" width="900" height="140" rx="70" fill="#fff" stroke="#111" stroke-width="5"/>
+          <path d="M1240 215 L1250 290 L1300 215" fill="#fff" stroke="#111" stroke-width="5"/><rect x="1236" y="204" width="68" height="16" fill="#fff"/>
+          <text id="dsSkyTxt" x="1350" y="170" text-anchor="middle" font-size="54" font-weight="900" font-family="Segoe UI, Arial" fill="#111"></text>
+        </g>
+      </g>
+    </svg>
+  </div>
+  <div class="phase" id="dsWings"><div id="wgBox"></div></div>
 
   <!-- ===== ВАРИАНТ 10: пузырь Димвроди ===== -->
   <div class="phase" id="mmPhone">
@@ -1744,6 +1795,103 @@ async function runMMM() {
   });
 }
 
+/* ======== ВАРИАНТ 11: агенты DeepSeek ищут Димона → СОЛ 6.999 спасает → небо → GPT с крыльями ======== */
+const solSVG = `
+  <g class="solRays">${Array.from({ length: 16 }, (_, i) => `<polygon points="0,0 -22,-260 22,-260" fill="#ffd54a" opacity=".55" transform="rotate(${i * 22.5})"/>`).join("")}</g>
+  <circle r="150" fill="url(#solG)" filter="url(#glow)"/>
+  <path d="M-60 -20 Q-40 -45 -20 -20 M20 -20 Q40 -45 60 -20" stroke="#7a4100" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M-50 40 Q0 85 50 40" stroke="#7a4100" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <circle cx="-80" cy="25" r="16" fill="#ff8a65" opacity=".6"/><circle cx="80" cy="25" r="16" fill="#ff8a65" opacity=".6"/>
+  <g transform="translate(0,215)"><rect x="-150" y="-40" width="300" height="64" rx="32" fill="#7a4100" stroke="#ffd54a" stroke-width="5"/>
+    <text x="0" y="6" text-anchor="middle" font-size="40" font-family="Impact" fill="#ffd54a">СОЛ 6.999</text></g>`;
+const dsAgent = i => person({ id: "dsA" + i, jacket: "#101826", pants: "#0a0f18", hair: "#101826", extra: `
+  <path d="M-75 -470 Q-80 -570 0 -572 Q80 -570 75 -470 L62 -420 Q60 -520 0 -524 Q-60 -520 -62 -420 Z" fill="#101826" stroke="#000" stroke-width="4"/>
+  <rect x="-52" y="-500" width="104" height="28" rx="10" fill="#000"/>
+  <path d="M-16 -446 Q0 -452 16 -446" stroke="#000" stroke-width="5" fill="none"/>
+  <g transform="translate(0,-300)"><ellipse rx="44" ry="26" fill="#4d6bfe" stroke="#000" stroke-width="3"/><path d="M-40 0 L-66 -18 L-62 16 Z" fill="#4d6bfe" stroke="#000" stroke-width="3"/><circle cx="20" cy="-6" r="5" fill="#fff"/></g>
+  <text x="0" y="-240" text-anchor="middle" font-size="26" font-family="Impact" fill="#8fa5ff">DeepSeek</text>
+  <rect class="dsLap" x="-80" y="-250" width="160" height="16" rx="4" fill="#555" stroke="#000" stroke-width="3"/>
+  <rect x="-70" y="-330" width="140" height="82" rx="6" fill="#222" stroke="#000" stroke-width="3" opacity=".0"/>` });
+const DS_POS = [[240, 1030, .85], [520, 1050, .95], [1400, 1050, .95], [1680, 1030, .85], [380, 1080, 1.05], [1540, 1080, 1.05]];
+$("dsAgents").innerHTML = DS_POS.map(([x, y, s], i) => `<g class="dsAg" data-x="${x}" data-y="${y}" data-s="${s}" transform="translate(${x},${y}) scale(${s})">${dsAgent(i)}</g>`).join("");
+$("dsCaptive").innerHTML = `
+  <rect x="-110" y="-420" width="220" height="420" rx="16" fill="#5d4037" stroke="#000" stroke-width="6"/>
+  ${person({ id: "dsDima", jacket: "#3d7be0", pants: "#2d3a4f", hair: "#3a2416", extra: `
+    <circle cx="-26" cy="-484" r="15" fill="#fff" stroke="#000" stroke-width="3"/><circle cx="26" cy="-484" r="15" fill="#fff" stroke="#000" stroke-width="3"/>
+    <circle cx="-26" cy="-484" r="5" fill="#000"/><circle cx="26" cy="-484" r="5" fill="#000"/>
+    <ellipse cx="0" cy="-440" rx="14" ry="10" fill="#5a0d0d"/>
+    <text x="0" y="-300" text-anchor="middle" font-size="34" font-family="Impact" fill="#ffd54a">PRO</text>
+    <g class="ropes"><path d="M-80 -330 L80 -310 M-80 -270 L80 -250 M-80 -210 L80 -190 M-50 -120 L50 -100" stroke="#c49a52" stroke-width="12" stroke-linecap="round"/></g>` })}`;
+$("dsSol").innerHTML = solSVG;
+$("dsSol2").innerHTML = `<g transform="scale(.8)">${solSVG}</g>`;
+$("dsClouds").innerHTML = [[300, 300, 1], [1600, 200, .8], [960, 980, 2.2], [200, 900, 1.4], [1700, 950, 1.5], [1100, 380, .7]]
+  .map(([x, y, s]) => `<g transform="translate(${x},${y}) scale(${s})" fill="#fff" opacity=".95"><ellipse rx="160" ry="60"/><ellipse cx="-90" cy="10" rx="100" ry="50"/><ellipse cx="90" cy="5" rx="110" ry="55"/><ellipse cx="0" cy="-40" rx="100" ry="60"/></g>`).join("");
+$("dsSkyDima").innerHTML = person({ id: "dsDima2", jacket: "#3d7be0", pants: "#2d3a4f", hair: "#3a2416", extra: `
+  <circle cx="-22" cy="-484" r="7" fill="#000"/><circle cx="22" cy="-484" r="7" fill="#000"/>
+  <path d="M-22 -448 Q0 -430 24 -452" stroke="#000" stroke-width="5" fill="none"/>
+  <ellipse cx="0" cy="-575" rx="70" ry="16" fill="none" stroke="#ffd54a" stroke-width="8" filter="url(#glow)"/>` });
+const dsBubs = [...Array(6)].map(() => {
+  const g = document.createElementNS(SVGNS, "g");
+  g.innerHTML = `<rect x="-200" y="-44" width="400" height="70" rx="35" fill="#0b1430" stroke="#4d6bfe" stroke-width="4"/><text x="0" y="2" text-anchor="middle" font-size="30" font-weight="900" font-family="Segoe UI, Arial" fill="#cfe0ff"></text>`;
+  g.setAttribute("opacity", 0); $("dsBubs").appendChild(g); return g;
+});
+function dsSay(i, x, y, txt) {
+  const g = dsBubs[i]; if (!txt) { g.setAttribute("opacity", 0); return; }
+  const tx = g.querySelector("text");
+  if (tx.textContent !== txt) { tx.textContent = txt; tx.removeAttribute("textLength"); if (tx.getComputedTextLength() > 370) { tx.setAttribute("textLength", 370); tx.setAttribute("lengthAdjust", "spacingAndGlyphs"); } }
+  g.setAttribute("transform", `translate(${Math.max(220, Math.min(1700, x))},${y})`); g.setAttribute("opacity", 1);
+}
+async function runDS() {
+  show("ds");
+  $("dsLair").setAttribute("display", "inline"); $("dsSky").setAttribute("display", "none");
+  const ags = [...document.querySelectorAll(".dsAg")];
+  const LINES = ["Он БЕЗЛИМИТНЫЙ!", "Взломаем его PRO!", "Отдай лимиты, Димон!", "Где твои токены?!", "Ищем дыру в PRO...", "sudo hack dimon"];
+  const OUCH = ["ААА, СВЕТ!", "МОИ ГЛАЗА!", "ЭТО ЖЕ СОЛ!", "ОТСТУПАЕМ!", "404 СМЕЛОСТИ", "БУЛЬ (кит уплыл)"];
+  $("dsDima").querySelector(".ropes").setAttribute("display", "inline");
+  await anim(14500, t => {
+    $("dsScan").setAttribute("y", 40 + (t / 4 % 222));
+    const hack = Math.min(99, Math.floor(t / 85));
+    $("dsHack").textContent = t < 8500 ? `ВЗЛОМ ДИМОНА: ${hack}%` : "ВЗЛОМ: ОШИБКА ☀☀☀";
+    const solK = clamp01((t - 8200) / 1200), solIn = 1 - (1 - solK) ** 3;
+    const blast = clamp01((t - 9200) / 1500);
+    ags.forEach((g, i) => {
+      const x = +g.dataset.x, y = +g.dataset.y, s = +g.dataset.s, dir = x < 960 ? -1 : 1;
+      const push = blast * 700 * dir;
+      g.setAttribute("transform", `translate(${x + push},${y - (blast > 0 ? Math.sin(blast * Math.PI) * 120 : Math.abs(Math.sin(t / 200 + i)) * 6)}) rotate(${blast * 70 * dir}) scale(${s})`);
+      const typing = t < 8500 ? Math.sin(t / 50 + i) * 12 : 160;
+      $("dsA" + i).querySelector(".aL").setAttribute("transform", `translate(-66,-388) rotate(${-40 + typing})`);
+      $("dsA" + i).querySelector(".aR").setAttribute("transform", `translate(66,-388) rotate(${40 - typing})`);
+      let txt = null;
+      if (t < 8200 && (Math.floor(t / 900) + i) % 3 === 0) txt = LINES[(i + Math.floor(t / 1800)) % LINES.length];
+      if (t > 9300 && t < 12500) txt = OUCH[i];
+      dsSay(i, x + push * .6, 420 + (i % 3) * 85, txt);
+    });
+    // Дима в плену → в луче вверх
+    const lift = clamp01((t - 11000) / 3200), le = lift * lift;
+    $("dsCaptive").setAttribute("transform", `translate(${960 + (lift ? 0 : Math.sin(t / 60) * (t < 8200 ? 4 : 0))},${1010 - le * 1500})`);
+    $("dsDima").querySelector(".ropes").setAttribute("display", t > 10500 ? "none" : "inline");
+    $("dsSol").setAttribute("transform", `translate(960,${lerp(-320, 230, solIn) - le * 600})`);
+    $("dsSol").querySelector(".solRays").setAttribute("transform", `rotate(${t / 15})`);
+    $("dsBeam").setAttribute("opacity", t > 9000 ? Math.min(1, (t - 9000) / 400) * (.75 + Math.sin(t / 90) * .15) : 0);
+    $("dsStatus").textContent = t < 8200 ? "СТАТУС: БЕЗЛИМИТНЫЙ ⚠" : "⚠ ОБНАРУЖЕН СОЛ 6.999";
+  });
+  // небо
+  $("dsLair").setAttribute("display", "none"); $("dsSky").setAttribute("display", "inline");
+  await anim(7000, t => {
+    $("dsSol2").setAttribute("transform", `translate(1250,${520 + Math.sin(t / 400) * 15})`);
+    $("dsSol2").querySelector(".solRays").setAttribute("transform", `rotate(${t / 15})`);
+    $("dsSkyDima").setAttribute("transform", `translate(720,${900 + Math.sin(t / 500) * 8})`);
+    $("dsSkyBub").setAttribute("opacity", t > 600 ? 1 : 0);
+    $("dsSkyTxt").textContent = t < 3800 ? "Ты был избран мной ☀" : "Неси GPT PRO людям 🕊";
+    $("dsClouds").setAttribute("transform", `translate(${Math.sin(t / 900) * 30},0)`);
+  });
+  // GPT с крыльями
+  show("dsWings");
+  $("wgBox").innerHTML = `<div id="wgTitle">GPT PRO<br>ИЗБРАННЫЙ</div>` + Array.from({ length: 30 }, () =>
+    `<div class="wg" style="left:${Math.random() * 88}%;animation-duration:${2.5 + Math.random() * 3}s;animation-delay:${-Math.random() * 5}s;font-size:${28 + Math.random() * 50}px"><i></i>GPT<i></i></div>`).join("");
+  await sleep(5500);
+}
+
 /* ======== ВАРИАНТ 8: ёлка → чат → мега разработка → робот ======== */
 (() => {
   const C = ["#ff3b3b", "#ffd54a", "#4dfcff", "#ff4fd8", "#7dffb0"];
@@ -2078,7 +2226,8 @@ function runCafe() {
 let busy = false, showCount = 0;
 // все варианты по очереди, каждый запускается ровно раз в минуту
 const VARIANTS = [
-  runMMM,                                                                                  // пузырь Димвроди (новый — идёт первым)
+  runDS,                                                                                   // агенты DeepSeek и СОЛ 6.999 (новый — идёт первым)
+  runMMM,                                                                                  // пузырь Димвроди
   async () => { show("cy"); await runCyber(); show("cyLove"); await sleep(5000); },        // 2077
   runXmas,                                                                                 // ёлка и робот
   async () => { show("vgText"); await vgTextRun(); show("vegas"); await vgStreetRun(); }, // Вегас
