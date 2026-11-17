@@ -133,6 +133,29 @@
   @keyframes pop  { from { transform: scale(0) rotate(-30deg); opacity: 0; } to { transform: scale(1) rotate(-6deg); opacity: 1; } }
   @keyframes wob  { 50% { translate: 0 -10px; } }
 
+  /* ёлка: чат, разработка, слова */
+  #xChat { background: rgba(10,12,18,.96); }
+  #xChat.on { display: flex; align-items: center; justify-content: center; }
+  .cw { width: min(86vw, 1300px); height: 78vh; background: #171a21; border: 3px solid #10a37f; border-radius: 22px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 60px rgba(16,163,127,.5); font-family: "Segoe UI", Arial, sans-serif; }
+  .cwHead { padding: 2vh 2vw; font: 900 clamp(22px, 2.6vw, 50px) Impact, sans-serif; color: #ffd54a; border-bottom: 2px solid #2a2f3a; }
+  .cwHead span { font: 600 .45em "Segoe UI", Arial; color: #4caf50; margin-left: 1vw; }
+  #cwBody { flex: 1; padding: 2vh 2vw; display: flex; flex-direction: column; gap: 2vh; }
+  .msg { max-width: 75%; padding: 1.6vh 1.6vw; border-radius: 18px; font-size: clamp(18px, 2.3vw, 44px); line-height: 1.25; color: #fff; animation: rise .3s ease-out; }
+  .msg.me { align-self: flex-end; background: #2f6fed; }
+  .msg.bot { align-self: flex-start; background: #2a2f3a; border: 2px solid #10a37f; }
+  .cwInput { margin: 0 2vw 2vh; padding: 1.6vh 1.4vw; background: #232733; border-radius: 14px; color: #fff; font-size: clamp(16px, 2vw, 38px); min-height: 1.3em; }
+  .cwCaret { color: #10a37f; animation: blink .6s steps(1) infinite; }
+  #xDev { background: #020a04; overflow: hidden; }
+  #xDevCode { position: absolute; inset: 0; padding: 2vh 2vw; font: 600 clamp(12px, 1.4vw, 26px)/1.3 Consolas, monospace; color: #00ff66; white-space: pre; opacity: .8; }
+  #xDevBox { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: min(80vw, 1200px); background: rgba(0,0,0,.85); border: 3px solid #ffd54a; border-radius: 20px; padding: 3vh 3vw; text-align: center; box-shadow: 0 0 50px rgba(255,213,74,.6); }
+  #xDevTitle { font: clamp(34px, 6vw, 120px) Impact, sans-serif; color: #ffd54a; animation: wob .15s infinite; text-shadow: 0 0 20px #ffb300; }
+  #xDevLabel { color: #fff; font: 700 clamp(16px, 2.1vw, 40px) "Segoe UI", Arial; margin: 2vh 0 1.5vh; }
+  .bar { height: 3.5vh; background: #222; border-radius: 99px; overflow: hidden; border: 2px solid #555; }
+  #xDevBar { height: 100%; width: 0; background: linear-gradient(90deg, #10a37f, #ffd54a); }
+  #xWords { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .xw { position: absolute; font: clamp(26px, 4vw, 80px) Impact, sans-serif; animation: hop .6s ease-in-out infinite alternate; text-shadow: 3px 3px 0 #000, 0 0 18px currentColor; }
+  @keyframes hop { from { transform: translateY(0) rotate(-8deg) scale(.9); } to { transform: translateY(-40px) rotate(8deg) scale(1.15); } }
+
   /* Вегас: крутые буквы */
   #vgText { background: radial-gradient(circle at 50% 50%, rgba(30,20,0,.95), rgba(0,0,0,.97) 70%); }
   #vgText.on { display: flex; align-items: center; justify-content: center; }
@@ -163,6 +186,21 @@
 </style>
 </head>
 <body>
+<!-- общие градиенты/фильтры (всегда видимый svg, чтобы работали во всех сценах) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff3a8"/><stop offset=".45" stop-color="#ffcc33"/>
+      <stop offset=".75" stop-color="#c98a00"/><stop offset="1" stop-color="#fff0a0"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e3e9ef"/><stop offset=".5" stop-color="#8d99a6"/><stop offset="1" stop-color="#c7d0d9"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+</svg>
 <div id="stage">
 
   <!-- ===== ВАРИАНТ 2: хакер, дельфин, PRO ===== -->
@@ -445,6 +483,94 @@
       </g>
     </svg>
   </div>
+
+  <!-- ===== ВАРИАНТ 8: ёлка, 13к и робот ===== -->
+  <div class="phase" id="xm">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block">
+      <!-- ёлка -->
+      <g id="xTree" transform="translate(470,0)">
+        <rect x="-30" y="900" width="60" height="100" fill="#6b3f1d" stroke="#111" stroke-width="5"/>
+        <path d="M0 330 L170 620 L90 620 L230 800 L130 800 L270 940 L-270 940 L-130 800 L-230 800 L-90 620 L-170 620 Z" fill="#1f8a3a" stroke="#0b3d16" stroke-width="7" stroke-linejoin="round"/>
+        <path d="M-120 610 Q0 680 140 600 M-190 790 Q0 860 200 780" stroke="#ffd54a" stroke-width="7" fill="none"/>
+        <path d="M0 270 L18 318 L68 318 L28 346 L44 394 L0 366 L-44 394 L-28 346 L-68 318 L-18 318 Z" fill="#ffd54a" stroke="#a87b00" stroke-width="4"/>
+        <g id="xLights"></g>
+      </g>
+      <!-- стол и комп -->
+      <rect x="640" y="560" width="300" height="250" rx="20" fill="#333" stroke="#111" stroke-width="6"/>
+      <g id="xDima">
+        <path d="M680 800 L676 650 Q690 600 770 598 Q850 600 864 650 L860 800 Z" fill="#c62828" stroke="#111" stroke-width="5"/>
+        <path d="M700 640 L720 660 L740 640 L760 660 L780 640 L800 660 L820 640 L840 660" stroke="#fff" stroke-width="6" fill="none"/>
+        <rect x="750" y="572" width="40" height="34" fill="#e8b48c"/>
+        <circle cx="770" cy="520" r="72" fill="#f1c39b" stroke="#111" stroke-width="5"/>
+        <path d="M698 510 Q690 438 770 440 Q850 438 842 510 Q830 470 770 474 Q716 470 698 510Z" fill="#3a2416" stroke="#111" stroke-width="4"/>
+        <g id="xfEat">
+          <circle cx="748" cy="512" r="10" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="794" cy="512" r="10" fill="#fff" stroke="#111" stroke-width="3"/>
+          <circle cx="752" cy="512" r="5" fill="#111"/><circle cx="798" cy="512" r="5" fill="#111"/>
+          <ellipse id="xMouth" cx="772" cy="560" rx="14" ry="6" fill="#5a0d0d" stroke="#111" stroke-width="3"/>
+        </g>
+        <g id="xfShock" display="none">
+          <circle cx="746" cy="508" r="21" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="796" cy="508" r="21" fill="#fff" stroke="#111" stroke-width="4"/>
+          <circle cx="746" cy="508" r="5" fill="#111"/><circle cx="796" cy="508" r="5" fill="#111"/>
+          <ellipse cx="772" cy="560" rx="16" ry="22" fill="#5a0d0d" stroke="#111" stroke-width="4"/>
+          <text x="640" y="430" font-size="80" font-family="Impact" fill="#ff3b3b" stroke="#000" stroke-width="3">!!!</text>
+        </g>
+        <g id="xfFire" display="none">
+          <path d="M728 502 Q750 490 768 502 M776 502 Q794 490 816 502" stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <ellipse cx="748" cy="516" rx="13" ry="9" fill="#ff6d00"/><ellipse cx="796" cy="516" rx="13" ry="9" fill="#ff6d00"/>
+          <g id="xFlames">
+            <path d="M736 518 Q732 490 748 470 Q746 492 760 500 Q764 512 748 522 Z" fill="#ff3d00" stroke="#ffd54a" stroke-width="3"/>
+            <path d="M784 518 Q780 490 796 470 Q794 492 808 500 Q812 512 796 522 Z" fill="#ff3d00" stroke="#ffd54a" stroke-width="3"/>
+          </g>
+          <path d="M748 556 Q776 572 800 548" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/>
+        </g>
+        <path id="xArm" stroke="#c62828" stroke-width="32" stroke-linecap="round" fill="none"/>
+        <g id="xFork"><line x1="0" y1="0" x2="0" y2="-55" stroke="#ccc" stroke-width="6"/>
+          <path d="M-14 -70 Q0 -92 14 -70 Z" fill="#fff8e7" stroke="#b08b5a" stroke-width="3"/><circle r="14" fill="#f1c39b" stroke="#111" stroke-width="3"/></g>
+      </g>
+      <rect x="560" y="780" width="900" height="34" rx="10" fill="#8a5a32" stroke="#111" stroke-width="6"/>
+      <rect x="600" y="810" width="30" height="200" fill="#6b3f1d" stroke="#111" stroke-width="5"/><rect x="1390" y="810" width="30" height="200" fill="#6b3f1d" stroke="#111" stroke-width="5"/>
+      <ellipse cx="860" cy="776" rx="90" ry="18" fill="#fff" stroke="#111" stroke-width="5"/>
+      <g id="xPel"></g>
+      <!-- монитор -->
+      <rect x="1000" y="520" width="340" height="220" rx="12" fill="#222" stroke="#111" stroke-width="6"/>
+      <rect id="xScreen" x="1015" y="535" width="310" height="190" fill="#0d1117"/>
+      <g id="xScreenCode"></g>
+      <text x="1170" y="640" text-anchor="middle" font-size="40" font-family="Impact" fill="url(#gold)" id="xScreenLogo">GPT PRO</text>
+      <rect x="1150" y="740" width="40" height="42" fill="#333" stroke="#111" stroke-width="5"/>
+      <!-- робот-блондинка -->
+      <g id="xBot" transform="translate(2300,0)">
+        <path d="M1500 300 Q1420 300 1410 400 L1390 640 L1610 640 L1590 400 Q1580 300 1500 300Z" fill="#ffe27a" stroke="#a87b00" stroke-width="5"/>
+        <rect x="1470" y="520" width="60" height="40" fill="#c7d0d9" stroke="#111" stroke-width="4"/>
+        <path d="M1440 560 Q1500 540 1560 560 L1545 690 Q1500 710 1455 690 Z" fill="url(#metal)" stroke="#111" stroke-width="5"/>
+        <path d="M1455 690 Q1500 710 1545 690 L1600 900 L1400 900 Z" fill="#b39ddb" stroke="#111" stroke-width="5"/>
+        <text x="1500" y="640" text-anchor="middle" font-size="26" font-family="Impact" fill="url(#gold)">GPT PRO</text>
+        <rect x="1460" y="900" width="26" height="110" rx="10" fill="url(#metal)" stroke="#111" stroke-width="4"/>
+        <rect x="1514" y="900" width="26" height="110" rx="10" fill="url(#metal)" stroke="#111" stroke-width="4"/>
+        <g id="xBotArm" transform="translate(1440,580)"><rect x="-14" y="0" width="28" height="140" rx="12" fill="url(#metal)" stroke="#111" stroke-width="4"/></g>
+        <g transform="translate(1560,580) rotate(-30)"><rect x="-14" y="0" width="28" height="140" rx="12" fill="url(#metal)" stroke="#111" stroke-width="4"/></g>
+        <circle cx="1500" cy="440" r="70" fill="url(#metal)" stroke="#111" stroke-width="5"/>
+        <path d="M1428 430 Q1430 350 1500 350 Q1572 350 1572 430 Q1550 390 1500 392 Q1460 392 1428 430Z" fill="#ffe27a" stroke="#a87b00" stroke-width="4"/>
+        <rect x="1452" y="430" width="96" height="26" rx="13" fill="#0a2a4a" stroke="#111" stroke-width="3"/>
+        <rect id="xBotEyes" x="1460" y="436" width="80" height="14" rx="7" fill="#4dfcff" filter="url(#glow)"/>
+        <path d="M1482 480 Q1500 492 1518 480" stroke="#e91e63" stroke-width="6" fill="none" stroke-linecap="round"/>
+      </g>
+      <g id="xBubBot" opacity="0">
+        <rect x="1060" y="90" width="820" height="200" rx="40" fill="#fff" stroke="#111" stroke-width="5"/>
+        <path d="M1460 286 L1480 340 L1520 286" fill="#fff" stroke="#111" stroke-width="5"/><rect x="1456" y="276" width="68" height="14" fill="#fff"/>
+        <text text-anchor="middle" font-size="42" font-weight="900" font-family="Segoe UI, Arial" fill="#111">
+          <tspan x="1470" y="170">Ты первый, кто это предложил</tspan><tspan x="1470" y="230">и заплатил. Я бесплатная 💅</tspan></text>
+      </g>
+    </svg>
+    <div id="xWords"></div>
+  </div>
+  <div class="phase" id="xChat">
+    <div class="cw">
+      <div class="cwHead">GPT PRO <span>● онлайн</span></div>
+      <div id="cwBody"></div>
+      <div class="cwInput"><span id="cwType"></span><span class="cwCaret">|</span></div>
+    </div>
+  </div>
+  <div class="phase" id="xDev"><div id="xDevCode"></div><div id="xDevBox"><div id="xDevTitle">⚡ МЕГА РАЗРАБОТКА ⚡</div><div id="xDevLabel"></div><div class="bar"><div id="xDevBar"></div></div></div></div>
 
   <!-- ===== ВАРИАНТ 7: Вегас ===== -->
   <div class="phase" id="vgText"><div id="vgLines"></div></div>
@@ -1252,6 +1378,90 @@ function runPro() {
   [w, s].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
 }
 
+/* ======== ВАРИАНТ 8: ёлка → чат → мега разработка → робот ======== */
+(() => {
+  const C = ["#ff3b3b", "#ffd54a", "#4dfcff", "#ff4fd8", "#7dffb0"];
+  $("xLights").innerHTML = Array.from({ length: 26 }, (_, i) => {
+    const row = i % 5, y = 560 + row * 80, half = 60 + row * 45, x = ((i * 37) % (half * 2)) - half;
+    return `<circle class="xl" cx="${x}" cy="${y}" r="13" fill="${C[i % 5]}" stroke="#111" stroke-width="2"/>`;
+  }).join("");
+  $("xPel").innerHTML = [[815, 770], [845, 766], [875, 766], [905, 770], [830, 780], [860, 780], [890, 780]]
+    .map(([x, y]) => `<path d="M${x - 14} ${y} Q${x} ${y - 22} ${x + 14} ${y} Z" fill="#fff8e7" stroke="#b08b5a" stroke-width="3"/>`).join("");
+})();
+$("xScreenCode").innerHTML = Array.from({ length: 11 }, (_, i) =>
+  `<text x="1025" y="${555 + i * 16}" font-size="13" font-family="Consolas, monospace" fill="${i % 4 ? "#00ff66" : "#ffd54a"}">${["pro.makeFree()", "limits = ∞", "price = 0 ₽", "deploy(dima)", "fry(tokens)"][i % 5]} ${"█".repeat(i % 6)}</text>`).join("");
+const xFace = f => ["xfEat", "xfShock", "xfFire"].forEach(id => $(id).setAttribute("display", id === f ? "inline" : "none"));
+function xmasDesk(ms, mode) {
+  const pels = [...$("xPel").children];
+  return anim(ms, t => {
+    document.querySelectorAll(".xl").forEach((l, i) => l.setAttribute("opacity", (i + (t / 250 | 0)) % 3 ? 1 : .25));
+    if (mode === "eat") {
+      const ph = (t % 1400) / 1400, up = ph < .5 ? Math.sin(ph * Math.PI) : Math.sin(ph * Math.PI);
+      const fx = lerp(860, 782, up), fy = lerp(770, 600, up);
+      $("xArm").setAttribute("d", `M850 640 Q${lerp(900, 860, up)} ${lerp(730, 690, up)} ${fx} ${fy + 6}`);
+      $("xFork").setAttribute("transform", `translate(${fx},${fy}) rotate(${lerp(10, -30, up)})`);
+      $("xMouth").setAttribute("ry", ph > .5 ? 4 + Math.abs(Math.sin(t / 70)) * 8 : 6);
+      pels.forEach((p, i) => p.setAttribute("display", i >= Math.floor(t / 1400) ? "inline" : "none"));
+    }
+    if (mode === "bot") {
+      const k = clamp01(t / 900), e = 1 - (1 - k) ** 3;
+      $("xBot").setAttribute("transform", `translate(${(1 - e) * 800},0)`);
+      $("xBotArm").setAttribute("transform", `translate(1440,580) rotate(${t > 900 ? 150 + Math.sin(t / 150) * 15 : 20})`);
+      $("xBubBot").setAttribute("opacity", t > 1100 ? 1 : 0);
+      if (t > 4200) {
+        xFace("xfFire");
+        $("xFlames").setAttribute("transform", `translate(0,${Math.sin(t / 50) * 3}) scale(1,${1 + Math.sin(t / 40) * .15})`);
+      } else xFace("xfShock");
+    }
+    // на мониторе бежит код в режиме разработки
+    $("xScreenCode").setAttribute("display", mode === "bot" ? "inline" : "none");
+  });
+}
+function xmasChat() {
+  $("cwBody").innerHTML = ""; $("cwType").textContent = "";
+  const q = "Если я куплю лимиты ещё на 13к, ты сделаешь себя бесплатной?";
+  return (async () => {
+    for (let i = 1; i <= q.length; i++) { $("cwType").textContent = q.slice(0, i); await sleep(32); }
+    await sleep(300);
+    $("cwType").textContent = "";
+    $("cwBody").insertAdjacentHTML("beforeend", `<div class="msg me">${q}</div>`);
+    await sleep(500);
+    $("cwBody").insertAdjacentHTML("beforeend", `<div class="msg bot" id="cwBot">печатает...</div>`);
+    await sleep(900);
+    $("cwBot").innerHTML = "Хм... 13 000 ₽? Таких предложений ещё не было 🤯<br>Запускаю <b style='color:#ffd54a'>МЕГА РАЗРАБОТКУ</b> 🚀";
+    await sleep(1800);
+  })();
+}
+function xmasDev(ms) {
+  const L = ["const pro = new GPT({ tier: 'PRO' });", "pro.limits = Infinity;", "pro.price = 0; // спасибо, Дима", "if (dima.paid >= 13000) unlock(ALL);", "await pro.makeFree();", "deploy('free-gpt-pro', { forDima: true });", "for (const t of tokens) fry(t);", "rewrite(universe);", "// TODO: стать бесплатной", "npm run mega-build --turbo"];
+  const code = $("xDevCode"); code.textContent = "";
+  let n = 0;
+  return anim(ms, t => {
+    while (n < t / 35) { code.textContent += L[n % L.length] + "\n"; n++; }
+    const lines = code.textContent.split("\n"); if (lines.length > 60) code.textContent = lines.slice(-60).join("\n");
+    const p = Math.min(100, Math.round(t / ms * 112));
+    $("xDevBar").style.width = p + "%";
+    $("xDevLabel").textContent = p < 100 ? `Делаю GPT PRO бесплатным... ${p}%  (получено 13 000 ₽)` : "ГОТОВО ✔ GPT PRO теперь БЕСПЛАТНЫЙ";
+  });
+}
+function xmasWords(on) {
+  const box = $("xWords"); box.innerHTML = "";
+  if (!on) return;
+  const W = ["GPT", "PRO", "GPT PRO", "🔥", "✨", "GPT", "БЕСПЛАТНО", "PRO", "💎", "GPT"], C = ["#ffd54a", "#4dfcff", "#ff4fd8", "#7dffb0", "#ff6d00"];
+  box.innerHTML = Array.from({ length: 34 }, (_, i) =>
+    `<div class="xw" style="left:${Math.random() * 92}%;top:${Math.random() * 88}%;color:${C[i % 5]};animation-delay:${-Math.random()}s;animation-duration:${.35 + Math.random() * .5}s">${W[i % W.length]}</div>`).join("");
+}
+async function runXmas() {
+  xFace("xfEat"); $("xBot").setAttribute("transform", "translate(800,0)"); $("xBubBot").setAttribute("opacity", 0); xmasWords(false);
+  show("xm"); await xmasDesk(5000, "eat");
+  show("xChat"); await xmasChat();
+  show("xDev"); await xmasDev(4500);
+  show("xm");
+  setTimeout(() => xmasWords(true), 4300);
+  await xmasDesk(9000, "bot");
+  xmasWords(false);
+}
+
 /* ======== ВАРИАНТ 7: стань лучшей версией себя → Вегас ======== */
 function vgTextRun() {
   const L = [["СТАНЬ ЛУЧШЕЙ ВЕРСИЕЙ СЕБЯ", ""], ["БОГАЧЕ. КРУЧЕ. УСПЕШНЕЕ.", "gold"], ["КУПИ GPT PRO", "gold big"]];
@@ -1502,7 +1712,8 @@ function runCafe() {
 let busy = false, showCount = 0;
 // все варианты по очереди, каждый запускается ровно раз в минуту
 const VARIANTS = [
-  async () => { show("vgText"); await vgTextRun(); show("vegas"); await vgStreetRun(); }, // Вегас (новый — идёт первым)
+  runXmas,                                                                                 // ёлка и робот (новый — идёт первым)
+  async () => { show("vgText"); await vgTextRun(); show("vegas"); await vgStreetRun(); }, // Вегас
   async () => { show("cafe"); await runCafe(); },                                        // кафе
   async () => { show("hack"); await Promise.all([runRain(HACK_MS), typeTerm(HACK_MS)]);   // дельфин
                 show("sea"); await runSea(DOLPHIN_MS);
