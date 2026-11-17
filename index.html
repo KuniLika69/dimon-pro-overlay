@@ -278,11 +278,62 @@
       </g>
     </svg>
   </div>
+
+  <!-- ===== СЦЕНА 6: очередь за сбросом лимитов (прозрачный фон) ===== -->
+  <div class="phase" id="queue">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block">
+      <g id="qWorld">
+        <!-- окошко -->
+        <rect x="1650" y="560" width="250" height="440" fill="#8a6f4d" stroke="#111" stroke-width="6"/>
+        <rect x="1680" y="640" width="190" height="130" fill="#cfe8ff" stroke="#111" stroke-width="5"/>
+        <text x="1775" y="720" text-anchor="middle" font-size="34" font-family="Impact" fill="#c00">ЗАКРЫТО</text>
+        <rect x="1540" y="420" width="370" height="120" rx="12" fill="#10a37f" stroke="#111" stroke-width="6"/>
+        <text x="1725" y="472" text-anchor="middle" font-size="40" font-family="Impact" fill="#fff">СБРОС ЛИМИТОВ</text>
+        <text x="1725" y="522" text-anchor="middle" font-size="44" font-family="Impact" fill="url(#gold)" stroke="#5a3d00" stroke-width="1.5">GPT PRO</text>
+        <g id="qBums"></g>
+        <g id="qMumbles"></g>
+        <!-- Дима ползёт -->
+        <g id="qCrawl" transform="translate(-300,1045)">
+          <g id="qLegB" transform="translate(-60,-62)"><path d="M0 0 L12 58 L-62 62" stroke="#24304a" stroke-width="28" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+          <g id="qArmB" transform="translate(62,-72)"><path d="M0 0 L8 70" stroke="#2f63b8" stroke-width="26" stroke-linecap="round"/><circle cx="8" cy="72" r="15" fill="#f1c39b" stroke="#111" stroke-width="3"/></g>
+          <ellipse cx="0" cy="-78" rx="88" ry="40" fill="#3d7be0" stroke="#111" stroke-width="5"/>
+          <g id="qLegF" transform="translate(-50,-58)"><path d="M0 0 L12 58 L-62 62" stroke="#2d3a4f" stroke-width="28" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+          <circle cx="110" cy="-98" r="42" fill="#f1c39b" stroke="#111" stroke-width="5"/>
+          <path d="M70 -110 Q80 -150 120 -142 Q150 -136 150 -110 Q130 -128 100 -122 Z" fill="#3a2416" stroke="#111" stroke-width="3"/>
+          <circle cx="130" cy="-102" r="6" fill="#111"/>
+          <path d="M118 -78 Q132 -72 146 -82" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <g id="qArmF" transform="translate(72,-68)"><path d="M0 0 L8 70" stroke="#3d7be0" stroke-width="28" stroke-linecap="round"/><circle cx="8" cy="72" r="16" fill="#f1c39b" stroke="#111" stroke-width="3"/></g>
+        </g>
+        <!-- Дима стоит / бежит -->
+        <g id="qStand" display="none">
+          <g id="qsLegL"><rect x="-38" y="-200" width="34" height="200" rx="14" fill="#2d3a4f" stroke="#111" stroke-width="5"/></g>
+          <g id="qsLegR"><rect x="4" y="-200" width="34" height="200" rx="14" fill="#2d3a4f" stroke="#111" stroke-width="5"/></g>
+          <path d="M-60 -180 L-72 -350 Q-60 -412 0 -414 Q60 -412 72 -350 L60 -180 Z" fill="#3d7be0" stroke="#111" stroke-width="5"/>
+          <g id="qsArmL" transform="translate(-66,-388)"><line x1="0" y1="0" x2="0" y2="140" stroke="#3d7be0" stroke-width="34" stroke-linecap="round"/><circle cx="0" cy="152" r="20" fill="#f1c39b" stroke="#111" stroke-width="4"/></g>
+          <g id="qsArmR" transform="translate(66,-388)"><line x1="0" y1="0" x2="0" y2="140" stroke="#3d7be0" stroke-width="34" stroke-linecap="round"/><circle cx="0" cy="152" r="20" fill="#f1c39b" stroke="#111" stroke-width="4"/></g>
+          <circle cx="0" cy="-480" r="62" fill="#f1c39b" stroke="#111" stroke-width="5"/>
+          <path d="M-64 -490 Q-72 -560 0 -558 Q72 -560 64 -490 Q52 -528 0 -524 Q-50 -528 -64 -490Z" fill="#3a2416" stroke="#111" stroke-width="4"/>
+          <circle cx="-22" cy="-484" r="11" fill="#fff" stroke="#111" stroke-width="3"/><circle cx="22" cy="-484" r="11" fill="#fff" stroke="#111" stroke-width="3"/>
+          <circle cx="-22" cy="-484" r="5" fill="#111"/><circle cx="22" cy="-484" r="5" fill="#111"/>
+          <path d="M-20 -446 Q-6 -454 6 -446 Q14 -440 22 -448" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M50 -520 q10 18 0 26 q-10 -8 0 -26z" fill="#6cc6ff" stroke="#111" stroke-width="2"/>
+        </g>
+        <text id="qSfx" x="0" y="960" font-size="80" font-family="Impact" fill="#ffe066" stroke="#000" stroke-width="4" opacity="0">ВЖУХ!</text>
+        <!-- речь Димы -->
+        <g id="qBub" opacity="0">
+          <rect x="560" y="200" width="900" height="140" rx="70" fill="#fff" stroke="#111" stroke-width="5"/>
+          <path d="M1180 335 L1240 420 L1250 335" fill="#fff" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
+          <rect x="1176" y="320" width="80" height="20" fill="#fff"/>
+          <text id="qBubText" x="1010" y="288" text-anchor="middle" font-size="52" font-weight="900" font-family="Segoe UI, Arial" fill="#111"></text>
+        </g>
+      </g>
+    </svg>
+  </div>
 </div>
 
 <script>
 /* ======================= НАСТРОЙКИ ======================= */
-const EVERY_MS = 60000; // шоу раз в минуту
+const EVERY_MS = 60000; // пауза (прозрачный фон) между шоу
 const FIRST_MS = 60000; // первое шоу через минуту после загрузки
 const STORY_MS = 16500; // Димон + качок
 const TEXT_MS  = 5500;  // "Димон PRO, а ты всё ещё гуглишь?"
@@ -644,6 +695,118 @@ function runWC() {
   });
 }
 
+/* ---------- СЦЕНА 6: очередь бомжей за сбросом лимитов ---------- */
+const Q_MS = 17500;
+const MUMBLES = ["бу-бу-бу...", "когда сброс?!", "лимит кончился...", "ещё 4 часа ждать", "осталось 3 сообщения", "бубубу", "я тут с утра стою", "дайте токенов...", "мммм бу-бу", "кто последний?"];
+const BUM_X = [1520, 1380, 1240, 1100, 960, 820, 680, 540, 400, 260, 120];
+const COATS = ["#6b5b45", "#5a6b4a", "#7a4e3a", "#4f5866", "#6e6250", "#5d4b3f"];
+const bums = BUM_X.map((x, i) => {
+  const coat = COATS[i % COATS.length], skin = ["#e2b48f", "#d39f78", "#c98f68"][i % 3];
+  const hat = i % 3 === 0
+    ? `<path d="M-44 -360 Q-46 -410 0 -412 Q46 -410 44 -360 Z" fill="${["#8b1e1e", "#2f4f2f", "#444"][i % 3]}" stroke="#111" stroke-width="4"/>`
+    : i % 3 === 1 ? `<path d="M-40 -372 Q-30 -395 0 -392 Q34 -398 42 -370 L30 -380 L18 -366 L4 -384 L-10 -368 L-24 -384Z" fill="#555"/>` : "";
+  const g = document.createElementNS(SVGNS, "g");
+  g.innerHTML = `
+    <ellipse cx="0" cy="0" rx="62" ry="12" fill="#000" opacity=".25"/>
+    <rect x="-32" y="-150" width="26" height="150" rx="10" fill="#3b3b3b" stroke="#111" stroke-width="4"/>
+    <rect x="6" y="-150" width="26" height="150" rx="10" fill="#3b3b3b" stroke="#111" stroke-width="4"/>
+    <ellipse cx="-22" cy="-4" rx="26" ry="12" fill="#2a1f14"/><ellipse cx="22" cy="-4" rx="26" ry="12" fill="#2a1f14"/>
+    <path d="M-58 -140 L-50 -300 Q0 -322 50 -300 L58 -140 L40 -150 L28 -136 L10 -150 L-8 -136 L-24 -150 L-40 -136 Z" fill="${coat}" stroke="#111" stroke-width="5"/>
+    <rect x="-36" y="-240" width="26" height="22" fill="#9c8a6a" stroke="#111" stroke-width="2" transform="rotate(-10,-23,-229)"/>
+    <g class="bArm"><line x1="-50" y1="-292" x2="-62" y2="-170" stroke="${coat}" stroke-width="24" stroke-linecap="round"/><circle cx="-62" cy="-166" r="13" fill="${skin}" stroke="#111" stroke-width="3"/></g>
+    <line x1="50" y1="-292" x2="62" y2="-170" stroke="${coat}" stroke-width="24" stroke-linecap="round"/><circle cx="62" cy="-166" r="13" fill="${skin}" stroke="#111" stroke-width="3"/>
+    <circle cx="0" cy="-345" r="42" fill="${skin}" stroke="#111" stroke-width="5"/>
+    <path d="M-40 -340 Q-36 -290 0 -292 Q36 -290 40 -340 Q30 -318 0 -322 Q-30 -318 -40 -340Z" fill="${["#777", "#5a4030", "#999"][i % 3]}" stroke="#111" stroke-width="3"/>
+    <circle cx="-15" cy="-352" r="4.5" fill="#111"/><circle cx="15" cy="-352" r="4.5" fill="#111"/>
+    <path class="bMouth" d="M-10 -325 Q0 -320 10 -325" stroke="#111" stroke-width="4" fill="none"/>
+    <path class="bAngry" d="M-26 -370 L-6 -360 M26 -370 L6 -360" stroke="#111" stroke-width="6" stroke-linecap="round" display="none"/>
+    ${hat}`;
+  $("qBums").appendChild(g);
+  const m = document.createElementNS(SVGNS, "g");
+  m.innerHTML = `<rect x="-110" y="-46" width="220" height="56" rx="26" fill="#fff" stroke="#111" stroke-width="4"/><path d="M-10 8 L0 30 L12 8" fill="#fff" stroke="#111" stroke-width="4"/><rect x="-14" y="2" width="30" height="8" fill="#fff"/><text x="0" y="-8" text-anchor="middle" font-size="26" font-weight="900" font-family="Segoe UI, Arial" fill="#333"></text>`;
+  m.setAttribute("opacity", 0);
+  $("qMumbles").appendChild(m);
+  return { g, m, x, phase: Math.random() * 6, until: 0 };
+});
+function bumSay(b, text, red, until) {
+  const tx = b.m.querySelector("text");
+  tx.textContent = text; tx.setAttribute("fill", red ? "#d00" : "#333");
+  tx.removeAttribute("textLength");
+  if (tx.getComputedTextLength() > 200) { tx.setAttribute("textLength", 200); tx.setAttribute("lengthAdjust", "spacingAndGlyphs"); }
+  b.until = until; b.m.setAttribute("opacity", 1);
+}
+function runQueue() {
+  const CRAWL0 = 1200, CRAWL1 = 7400, STOPX = 1260, RUN0 = 14600, RUN1 = 16000, GY = 1045;
+  const lines = [[7900, "Э-э... я не лезу, я просто... шнурок!"], [9800, "Да мне только спросить!"], [11500, "Да у меня GPT PRO!"], [13100, "У меня лимитов КУЧА! ПОКА!"], [14600, null]];
+  let li = 0, nextMumble = 0, caught = false;
+  $("qStand").setAttribute("display", "none"); $("qCrawl").setAttribute("display", "inline");
+  $("qBub").setAttribute("opacity", 0);
+  bums.forEach(b => { b.until = 0; b.m.setAttribute("opacity", 0); b.g.querySelector(".bAngry").setAttribute("display", "none"); });
+  return anim(Q_MS, t => {
+    // фразы Димы
+    while (li < lines.length && t >= lines[li][0]) {
+      const v = lines[li++][1];
+      if (v) { $("qBubText").textContent = v; $("qBub").setAttribute("opacity", 1); } else $("qBub").setAttribute("opacity", 0);
+    }
+    const angry = t > 7400 && t < RUN1 + 600;
+    // бомжи качаются и бубнят
+    bums.forEach((b, i) => {
+      const sh = angry ? Math.sin(t / 50 + i) * 4 : 0;
+      b.g.setAttribute("transform", `translate(${b.x + sh},1000) rotate(${Math.sin(t / 600 + b.phase) * 2.5},0,0)`);
+      b.g.querySelector(".bArm").setAttribute("transform", angry ? `rotate(${120 + Math.sin(t / 90 + i) * 15},-50,-292)` : "");
+      b.g.querySelector(".bAngry").setAttribute("display", angry ? "inline" : "none");
+      b.m.setAttribute("transform", `translate(${b.x},${560 + Math.sin(t / 300 + i) * 4})`);
+      if (t > b.until) b.m.setAttribute("opacity", 0);
+    });
+    if (!angry && t > nextMumble) {
+      const b = bums[Math.random() * bums.length | 0];
+      bumSay(b, MUMBLES[Math.random() * MUMBLES.length | 0], false, t + 1300);
+      nextMumble = t + 380;
+    }
+    if (t > 4300 && t < 4400) bumSay(bums[7], "...кто это ползёт?", false, t + 1800);
+    if (angry && !caught) {
+      caught = true;
+      const yells = ["ЭЙ! КУДА?!", "В ОЧЕРЕДЬ!!!", "НАГЛЁЖ!", "Я С УТРА ТУТ!", "ЭЭЭЭ!!", "ПОЛЗУН!"];
+      [0, 1, 2, 4, 6].forEach((bi, k) => bumSay(bums[bi], yells[k], true, 13000));
+    }
+    if (t > RUN0 + 300 && t < RUN0 + 400) [3, 5, 8].forEach((bi, k) => bumSay(bums[bi], ["ЧЁЁЁ?!", "У НЕГО PRO?!", "???"][k], true, RUN1 + 800));
+    if (t > RUN1 + 800 && t < RUN1 + 900) [2, 6].forEach(bi => bumSay(bums[bi], "бу-бу-бу...", false, Q_MS));
+
+    // Дима
+    if (t < CRAWL1) {
+      const k = clamp01((t - CRAWL0) / (CRAWL1 - CRAWL0));
+      const sw = Math.sin(t / 110) * 22;
+      $("qCrawl").setAttribute("transform", `translate(${lerp(-300, STOPX, k)},${GY - Math.abs(Math.sin(t / 110)) * 5})`);
+      $("qArmF").setAttribute("transform", `translate(72,-68) rotate(${sw})`);
+      $("qArmB").setAttribute("transform", `translate(62,-72) rotate(${-sw})`);
+      $("qLegF").setAttribute("transform", `translate(-50,-58) rotate(${-sw * .6})`);
+      $("qLegB").setAttribute("transform", `translate(-60,-62) rotate(${sw * .6})`);
+    } else {
+      $("qCrawl").setAttribute("display", "none");
+      $("qStand").setAttribute("display", "inline");
+      if (t < RUN0) {
+        // оправдывается — машет руками
+        $("qStand").setAttribute("transform", `translate(${STOPX},${GY})`);
+        $("qsArmL").setAttribute("transform", `translate(-66,-388) rotate(${40 + Math.sin(t / 120) * 35})`);
+        $("qsArmR").setAttribute("transform", `translate(66,-388) rotate(${-40 - Math.sin(t / 120 + 1) * 35})`);
+        $("qsLegL").setAttribute("transform", ""); $("qsLegR").setAttribute("transform", "");
+      } else {
+        // убегает
+        const k = clamp01((t - RUN0) / (RUN1 - RUN0));
+        const x = lerp(STOPX, -400, k * k * (3 - 2 * k));
+        const sw = Math.sin(t / 45) * 35;
+        $("qStand").setAttribute("transform", `translate(${x},${GY - Math.abs(Math.sin(t / 45)) * 14}) scale(-1,1)`);
+        $("qsLegL").setAttribute("transform", `rotate(${sw},-20,-200)`);
+        $("qsLegR").setAttribute("transform", `rotate(${-sw},20,-200)`);
+        $("qsArmL").setAttribute("transform", `translate(-66,-388) rotate(${-sw})`);
+        $("qsArmR").setAttribute("transform", `translate(66,-388) rotate(${sw})`);
+        $("qSfx").setAttribute("x", x + 120); $("qSfx").setAttribute("opacity", k < 1 ? 1 : 0);
+      }
+    }
+    if (t < RUN0) $("qSfx").setAttribute("opacity", 0);
+  });
+}
+
 /* ---------- шоу ---------- */
 let busy = false;
 async function playShow() {
@@ -653,6 +816,7 @@ async function playShow() {
   show("txt"); await runText();
   show("td"); await runTD(TD_MS);
   show("wc"); await runWC();
+  show("queue"); await runQueue();
   stage.classList.remove("on");
   await sleep(450);
   show(null);
@@ -661,7 +825,11 @@ async function playShow() {
 
 // если страница только что сама обновилась на новую версию — показываем новое шоу сразу
 const JUST_UPDATED = new URLSearchParams(location.search).has("v");
-setTimeout(() => { playShow(); setInterval(playShow, EVERY_MS); }, JUST_UPDATED ? 1500 : FIRST_MS);
+// шоу → минута прозрачного фона → шоу → ...
+(async () => {
+  await sleep(JUST_UPDATED ? 1500 : FIRST_MS);
+  while (true) { await playShow(); await sleep(EVERY_MS); }
+})();
 
 /* ---------- автообновление ----------
    Каждые 10 сек страница смотрит version.txt. Если версия поменялась —
