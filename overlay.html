@@ -479,10 +479,12 @@ async function playShow() {
   busy = false;
 }
 
-setTimeout(() => { playShow(); setInterval(playShow, EVERY_MS); }, FIRST_MS);
+// если страница только что сама обновилась на новую версию — показываем новое шоу сразу
+const JUST_UPDATED = new URLSearchParams(location.search).has("v");
+setTimeout(() => { playShow(); setInterval(playShow, EVERY_MS); }, JUST_UPDATED ? 1500 : FIRST_MS);
 
 /* ---------- автообновление ----------
-   Каждые 30 сек страница смотрит version.txt. Если версия поменялась —
+   Каждые 10 сек страница смотрит version.txt. Если версия поменялась —
    тихо перезагружается (только когда экран прозрачный, не посреди шоу).
    Ссылка в OBS при этом остаётся той же. */
 let myVersion = null;
@@ -500,7 +502,7 @@ async function checkUpdate() {
   } catch (e) { /* нет интернета — просто пробуем позже */ }
 }
 checkUpdate();
-setInterval(checkUpdate, 30000);
+setInterval(checkUpdate, 10000);
 </script>
 </body>
 </html>
