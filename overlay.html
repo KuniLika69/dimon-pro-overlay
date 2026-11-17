@@ -133,6 +133,15 @@
   @keyframes pop  { from { transform: scale(0) rotate(-30deg); opacity: 0; } to { transform: scale(1) rotate(-6deg); opacity: 1; } }
   @keyframes wob  { 50% { translate: 0 -10px; } }
 
+  /* 2077: финальное сердце */
+  #cyLove { background: radial-gradient(circle at 50% 50%, rgba(80,0,50,.95), rgba(0,0,0,.97) 70%); overflow: hidden; }
+  #cyLove.on { display: flex; align-items: center; justify-content: center; }
+  .lvHeart { position: absolute; font-size: min(95vh, 95vw); line-height: 1; color: #ff2f6d; filter: drop-shadow(0 0 60px #ff2f92); animation: beat .7s ease-in-out infinite; }
+  @keyframes beat { 0%,100% { transform: scale(.9); } 30% { transform: scale(1.05); } 60% { transform: scale(.95); } }
+  .lvText { position: relative; text-align: center; font-family: Impact, sans-serif; animation: slam .6s cubic-bezier(.2,1.6,.4,1) both; }
+  .lv1 { font-size: clamp(60px, 12vw, 250px); color: #fff; text-shadow: 6px 6px 0 #000, 0 0 30px #fff; }
+  .lv2 { font-size: clamp(26px, 4.6vw, 100px); color: #ffe066; text-shadow: 4px 4px 0 #000, 0 0 20px #ffb300; }
+
   /* ёлка: чат, разработка, слова */
   #xChat { background: rgba(10,12,18,.96); }
   #xChat.on { display: flex; align-items: center; justify-content: center; }
@@ -483,6 +492,44 @@
       </g>
     </svg>
   </div>
+
+  <!-- ===== ВАРИАНТ 9: 2077 ===== -->
+  <div class="phase" id="cy">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block">
+      <defs>
+        <linearGradient id="cySky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#08001a"/><stop offset=".6" stop-color="#2a0548"/><stop offset="1" stop-color="#ff2f92"/></linearGradient>
+        <filter id="cyNeon" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <g id="cyRun">
+        <rect width="1920" height="1080" fill="url(#cySky)"/>
+        <g id="cyFar"></g><g id="cyNear"></g>
+        <text x="960" y="120" text-anchor="middle" font-size="110" font-family="Impact" fill="#00f0ff" filter="url(#cyNeon)">2077</text>
+        <rect x="0" y="930" width="1920" height="150" fill="#120a1f"/>
+        <path id="cyRoadLine" d="M-200 1000 H2200" stroke="#ff2fd0" stroke-width="10" stroke-dasharray="120 80" filter="url(#cyNeon)"/>
+        <g id="cyFollowers"></g>
+        <g id="cyDimaG"></g>
+        <g id="cySucG"></g>
+        <text id="cyWhipFx" x="0" y="0" font-size="90" font-family="Impact" fill="#ff2f6d" stroke="#000" stroke-width="4" opacity="0">ЩЁЛК!</text>
+        <g id="cyShouts"></g>
+        <g id="cyNicks"></g>
+      </g>
+      <g id="cyRoof" display="none">
+        <rect width="1920" height="1080" fill="url(#cySky)"/>
+        <circle cx="1560" cy="200" r="110" fill="#ffe9f5" filter="url(#cyNeon)" opacity=".9"/>
+        <g id="cyBelow"></g>
+        <rect x="200" y="880" width="1520" height="200" fill="#1c1430" stroke="#00f0ff" stroke-width="6"/>
+        <path d="M200 880 H1720" stroke="#ff2fd0" stroke-width="8" filter="url(#cyNeon)"/>
+        <g id="cyRoofPair"></g>
+        <g id="cyRoofBub" opacity="0">
+          <rect x="300" y="160" width="860" height="130" rx="65" fill="#fff" stroke="#111" stroke-width="5"/>
+          <path d="M760 285 L800 360 L830 285" fill="#fff" stroke="#111" stroke-width="5"/><rect x="756" y="274" width="78" height="16" fill="#fff"/>
+          <text x="730" y="245" text-anchor="middle" font-size="50" font-weight="900" font-family="Segoe UI, Arial" fill="#111">А ты знала, с чего я начал?</text>
+        </g>
+        <text id="cyRoofQ" x="1160" y="330" font-size="90" font-family="Impact" fill="#ff2f6d" stroke="#000" stroke-width="3" opacity="0">?! 💘</text>
+      </g>
+    </svg>
+  </div>
+  <div class="phase" id="cyLove"><div class="lvHeart">❤</div><div class="lvText"><div class="lv1">GPT PRO</div><div class="lv2">вайб любви — код надежды</div></div></div>
 
   <!-- ===== ВАРИАНТ 8: ёлка, 13к и робот ===== -->
   <div class="phase" id="xm">
@@ -1378,6 +1425,145 @@ function runPro() {
   [w, s].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
 }
 
+/* ======== ВАРИАНТ 9: 2077, КиберПроГрад ======== */
+// человечек с той же геометрией, что tuxDima (чтобы работал walkPose)
+const person = ({ id, jacket, pants, hair, skin = "#f1c39b", label = "", labelY = -600, extra = "" }) => `
+  <g id="${id}">
+    <ellipse cx="0" cy="0" rx="80" ry="12" fill="#000" opacity=".3"/>
+    <g class="lL"><rect x="-36" y="-200" width="32" height="200" rx="10" fill="${pants}" stroke="#000" stroke-width="4"/><ellipse cx="-22" cy="-4" rx="30" ry="12" fill="#000"/></g>
+    <g class="lR"><rect x="4" y="-200" width="32" height="200" rx="10" fill="${pants}" stroke="#000" stroke-width="4"/><ellipse cx="22" cy="-4" rx="30" ry="12" fill="#000"/></g>
+    <path d="M-62 -180 L-72 -350 Q-60 -410 0 -412 Q60 -410 72 -350 L62 -180 Z" fill="${jacket}" stroke="#000" stroke-width="4"/>
+    <g class="aL" transform="translate(-66,-388)"><line x1="0" y1="0" x2="0" y2="140" stroke="${jacket}" stroke-width="32" stroke-linecap="round"/><circle cx="0" cy="152" r="19" fill="${skin}" stroke="#000" stroke-width="3"/></g>
+    <g class="aR" transform="translate(66,-388)"><line x1="0" y1="0" x2="0" y2="140" stroke="${jacket}" stroke-width="32" stroke-linecap="round"/><circle cx="0" cy="152" r="19" fill="${skin}" stroke="#000" stroke-width="3"/></g>
+    <circle cx="0" cy="-480" r="62" fill="${skin}" stroke="#000" stroke-width="5"/>
+    <path d="M-64 -490 Q-72 -560 0 -558 Q72 -560 64 -490 Q52 -528 0 -524 Q-50 -528 -64 -490Z" fill="${hair}" stroke="#000" stroke-width="4"/>
+    ${extra}
+    ${label ? `<g class="nick" transform="translate(0,${labelY})"><rect x="-140" y="-38" width="280" height="56" rx="28" fill="#000" stroke="#00f0ff" stroke-width="4"/><text x="0" y="2" text-anchor="middle" font-size="34" font-weight="900" font-family="Segoe UI, Arial" fill="#00f0ff">${label}</text></g>` : ""}
+  </g>`;
+const angryFace = `<path d="M-40 -506 L-10 -494 M40 -506 L10 -494" stroke="#000" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="-22" cy="-480" r="7" fill="#000"/><circle cx="22" cy="-480" r="7" fill="#000"/><ellipse cx="0" cy="-445" rx="18" ry="14" fill="#5a0d0d" stroke="#000" stroke-width="3"/>`;
+const FOLLOW = [["джункспро", "#2e7d32", "#111", "#5a3a1a"], ["тода_делитни", "#6a1b9a", "#263238", "#111"], ["сжумс", "#ef6c00", "#37474f", "#d4a017"],
+  ["годинкофдиф", "#b39ddb", "#4a148c", "#e7b6ff"], ["бейбаБибис", "#d81b60", "#212121", "#ff8fc7"]];
+$("cyFollowers").innerHTML = FOLLOW.map(([n, j, p, h], i) =>
+  `<g class="cyF" data-i="${i}">${person({ id: "cyF" + i, jacket: j, pants: p, hair: h, extra: angryFace })}</g>`).join("");
+// ники — отдельным слоем поверх всех, чтобы ничего их не закрывало
+$("cyNicks").innerHTML = FOLLOW.map(([n]) => `<g class="cyNick"><rect x="-120" y="-30" width="240" height="46" rx="23" fill="#000" stroke="#00f0ff" stroke-width="4"/><text x="0" y="2" text-anchor="middle" font-size="28" font-weight="900" font-family="Segoe UI, Arial" fill="#00f0ff">${n}</text></g>`).join("");
+$("cyDimaG").innerHTML = person({ id: "cyDima", jacket: "#141428", pants: "#0d0d1a", hair: "#3a2416", extra: `
+  <path d="M-62 -350 L62 -350 M-58 -260 L58 -260" stroke="#00f0ff" stroke-width="6" filter="url(#cyNeon)"/>
+  <text x="0" y="-290" text-anchor="middle" font-size="34" font-family="Impact" fill="#ffd54a">PRO</text>
+  <rect x="-54" y="-504" width="108" height="30" rx="15" fill="#00f0ff" opacity=".85" filter="url(#cyNeon)"/>
+  <path d="M-22 -448 Q0 -436 24 -452" stroke="#000" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M-50 -556 L-50 -606 L-25 -578 L0 -616 L25 -578 L50 -606 L50 -556 Z" fill="url(#gold)" stroke="#7a5600" stroke-width="4"/>` });
+const succubus = id => `
+  <g id="${id}">
+    <ellipse cx="0" cy="0" rx="80" ry="12" fill="#000" opacity=".3"/>
+    <path class="sTail" d="M30 -230 Q140 -200 120 -100 Q110 -40 170 -60" stroke="#111" stroke-width="10" fill="none"/>
+    <path d="M160 -80 L195 -60 L165 -40 Z" fill="#ff2f6d" stroke="#000" stroke-width="3"/>
+    <path d="M-70 -430 Q-120 -360 -110 -250" stroke="#e8471e" stroke-width="30" fill="none" stroke-linecap="round" stroke-dasharray="26 6"/>
+    <path d="M70 -430 Q120 -360 110 -250" stroke="#e8471e" stroke-width="30" fill="none" stroke-linecap="round" stroke-dasharray="26 6"/>
+    <rect x="-34" y="-200" width="30" height="200" rx="12" fill="#111" stroke="#000" stroke-width="4"/>
+    <rect x="4" y="-200" width="30" height="200" rx="12" fill="#111" stroke="#000" stroke-width="4"/>
+    <path d="M-34 -20 L-34 0 L-6 0 L-6 -20 Z M6 -20 L6 0 L34 0 L34 -20 Z" fill="#ff2f6d"/>
+    <path d="M-56 -190 L-62 -340 Q-50 -400 0 -402 Q50 -400 62 -340 L56 -190 Z" fill="#111" stroke="#000" stroke-width="4"/>
+    <path d="M-40 -380 Q-46 -300 -36 -210" stroke="#555" stroke-width="8" fill="none" opacity=".8"/>
+    <path d="M-56 -190 L56 -190 L60 -170 L-60 -170 Z" fill="#ff2f6d"/>
+    <g transform="translate(-60,-378) rotate(30)"><line x1="0" y1="0" x2="0" y2="130" stroke="#111" stroke-width="26" stroke-linecap="round"/><circle cx="0" cy="140" r="16" fill="#ffd9c4" stroke="#000" stroke-width="3"/></g>
+    <g class="sArm" transform="translate(60,-378)"><line x1="0" y1="0" x2="0" y2="130" stroke="#111" stroke-width="26" stroke-linecap="round"/>
+      <circle cx="0" cy="140" r="16" fill="#ffd9c4" stroke="#000" stroke-width="3"/>
+      <path class="sWhip" d="M0 140 Q60 200 140 170 Q220 140 260 200" stroke="#3b1d0d" stroke-width="7" fill="none" stroke-linecap="round"/></g>
+    <circle cx="0" cy="-465" r="58" fill="#ffd9c4" stroke="#000" stroke-width="5"/>
+    <path d="M-60 -470 Q-66 -540 0 -538 Q66 -540 60 -470 Q40 -512 0 -506 Q-40 -512 -60 -470Z" fill="#e8471e" stroke="#000" stroke-width="4"/>
+    <path d="M-40 -530 Q-70 -580 -50 -610 Q-48 -575 -24 -540 Z M40 -530 Q70 -580 50 -610 Q48 -575 24 -540 Z" fill="#7a0019" stroke="#000" stroke-width="4"/>
+    <path d="M-36 -478 L-12 -470 M36 -478 L12 -470" stroke="#000" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="-22" cy="-462" r="6" fill="#2e7d32"/><circle cx="22" cy="-462" r="6" fill="#2e7d32"/>
+    <path d="M-16 -430 Q0 -420 18 -434" stroke="#c2185b" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>`;
+$("cySucG").innerHTML = succubus("cySuc");
+(() => {
+  const bld = (n, hMin, hMax, col, win, seed) => Array.from({ length: n }, (_, i) => {
+    const w = 140 + (i * 53 + seed) % 90, h = hMin + (i * 97 + seed) % (hMax - hMin), x = i * 200;
+    let wins = "";
+    for (let yy = 940 - h + 30; yy < 900; yy += 46) for (let xx = x + 18; xx < x + w - 20; xx += 34)
+      if ((xx * 7 + yy * 3 + seed) % 5) wins += `<rect x="${xx}" y="${yy}" width="16" height="22" fill="${win[(xx + yy) % win.length]}" opacity=".85"/>`;
+    return `<rect x="${x}" y="${940 - h}" width="${w}" height="${h}" fill="${col}" stroke="#000" stroke-width="3"/>${wins}`;
+  }).join("");
+  const far = bld(20, 300, 700, "#1a0f33", ["#7b2cff", "#ff2fd0"], 11);
+  const near = bld(20, 200, 520, "#24123f", ["#00f0ff", "#ffe066", "#ff2fd0"], 29) +
+    `<text x="900" y="420" font-size="54" font-family="Impact" fill="#ff2fd0" filter="url(#cyNeon)">КИБЕРПРОГРАД</text>
+     <text x="2900" y="500" font-size="54" font-family="Impact" fill="#00f0ff" filter="url(#cyNeon)">GPT PRO 24/7</text>`;
+  $("cyFar").innerHTML = `<g>${far}</g><g transform="translate(4000,0)">${far}</g>`;
+  $("cyNear").innerHTML = `<g>${near}</g><g transform="translate(4000,0)">${near}</g>`;
+  $("cyBelow").innerHTML = `<g transform="translate(0,220) scale(.5,.75)">${far}</g>`;
+})();
+const cyShout = [...Array(5)].map(() => {
+  const g = document.createElementNS(SVGNS, "g");
+  g.innerHTML = `<rect x="-250" y="-50" width="500" height="80" rx="40" fill="#fff" stroke="#000" stroke-width="4"/><text x="0" y="4" text-anchor="middle" font-size="30" font-weight="900" font-family="Segoe UI, Arial" fill="#c00"></text>`;
+  g.setAttribute("opacity", 0); $("cyShouts").appendChild(g); return g;
+});
+const SHOUTS = ["Почему ты успешный?!", "Почему мы смеялись, а ты стал царём КиберПроГрада?!", "Почему не взял нас с собой?!", "ДИМОН, ПОДОЖДИ!!!", "Дай хоть лимитов!", "МЫ ЖЕ ДРУЗЬЯ!"];
+function runCyber() {
+  $("cyRun").setAttribute("display", "inline"); $("cyRoof").setAttribute("display", "none");
+  const D = $("cyDima"), S = $("cySuc"), fol = [...document.querySelectorAll(".cyF")];
+  $("cyRoofPair").innerHTML = "";
+  return anim(14500, t => {
+    const sc = t * .9;
+    $("cyFar").setAttribute("transform", `translate(${-(sc * .3 % 4000)},0)`);
+    $("cyNear").setAttribute("transform", `translate(${-(sc * .7 % 4000)},0)`);
+    $("cyRoadLine").setAttribute("transform", `translate(${-(sc * 1.4 % 200)},0)`);
+    // Дима бежит
+    $("cyDimaG").setAttribute("transform", `translate(1250,${960 - Math.abs(Math.sin(t / 95)) * 18}) scale(.9)`);
+    walkPose(D, t * 1.4, true);
+    // суккуб
+    const sIn = clamp01((t - 8000) / 700);
+    const sx = lerp(2300, 860, 1 - (1 - sIn) ** 3);
+    $("cySucG").setAttribute("transform", `translate(${sx},${960 - Math.sin(sIn * Math.PI) * 200}) scale(-.92,.92)`);
+    const crack = t > 9000 && t < 12500 ? Math.sin((t - 9000) / 110) : 0;
+    S.querySelector(".sArm").setAttribute("transform", `translate(60,-378) rotate(${-110 + crack * 60})`);
+    S.querySelector(".sWhip").setAttribute("d", `M0 140 Q${60 + crack * 40} ${200 - crack * 80} ${140 + crack * 30} ${170 + crack * 60} Q${220} ${140 - crack * 60} ${260 + crack * 40} ${200 + crack * 40}`);
+    S.querySelector(".sTail").setAttribute("transform", `rotate(${Math.sin(t / 200) * 8},30,-230)`);
+    $("cyWhipFx").setAttribute("opacity", crack > .85 ? 1 : 0);
+    $("cyWhipFx").setAttribute("x", 380); $("cyWhipFx").setAttribute("y", 480);
+    // подписчики
+    const flee = clamp01((t - 9500) / 2500);
+    fol.forEach((f, i) => {
+      const baseX = 120 + i * 155 - (i % 2) * 40;
+      const chase = Math.sin(t / 700 + i) * 25;
+      const x = baseX + chase - flee * flee * 1400;
+      f.setAttribute("transform", `translate(${x},${985 - (i % 2) * 30 - Math.abs(Math.sin(t / 100 + i)) * 16}) scale(${.72 + (i % 2) * .05}) ${flee > 0 ? "scale(-1,1)" : ""}`);
+      walkPose($("cyF" + i), t * 1.3 + i * 80, true);
+      $("cyNicks").children[i].setAttribute("transform", `translate(${x},${985 - (i % 2) * 30 - (i % 2 ? 610 : 520)})`);
+      $("cyF" + i).querySelector(".aR").setAttribute("transform", `translate(66,-388) rotate(${flee > 0 ? 170 : -130 + Math.sin(t / 80 + i) * 20})`);
+      const sh = cyShout[i];
+      const sx2 = Math.max(320, Math.min(1600, x + 60));
+      sh.setAttribute("transform", `translate(${sx2},${150 + i * 54})`);
+      let txt = null;
+      if (t < 8800) { const k = Math.floor(t / 1600 + i * 1.7) % SHOUTS.length; if ((Math.floor(t / 800) + i) % 3 !== 0) txt = SHOUTS[k]; }
+      else if (flee > 0 && flee < .9) txt = ["АААА!!!", "МАМА!", "ОНА С ПЛЁТКОЙ!", "ИЗВИНИ, ДИМОН!", "УБЕГАЕМ!"][i];
+      const tx = sh.querySelector("text");
+      if (txt) {
+        if (tx.textContent !== txt) {
+          tx.textContent = txt; tx.removeAttribute("textLength");
+          if (tx.getComputedTextLength() > 470) { tx.setAttribute("textLength", 470); tx.setAttribute("lengthAdjust", "spacingAndGlyphs"); }
+        }
+        sh.setAttribute("opacity", 1);
+      } else sh.setAttribute("opacity", 0);
+    });
+  }).then(() => {
+    // крыша небоскрёба
+    $("cyRun").setAttribute("display", "none"); $("cyRoof").setAttribute("display", "inline");
+    $("cyRoofPair").innerHTML = `<g transform="translate(780,880)">${person({ id: "cyDima2", jacket: "#141428", pants: "#0d0d1a", hair: "#3a2416", extra: `
+      <rect x="-54" y="-504" width="108" height="30" rx="15" fill="#00f0ff" opacity=".85"/><path d="M-22 -448 Q0 -436 24 -452" stroke="#000" stroke-width="5" fill="none"/>
+      <path d="M-50 -556 L-50 -606 L-25 -578 L0 -616 L25 -578 L50 -606 L50 -556 Z" fill="url(#gold)" stroke="#7a5600" stroke-width="4"/>` })}</g>
+      <g transform="translate(1040,880) scale(-1,1)">${succubus("cySuc2")}</g>`;
+    return anim(6500, t => {
+      $("cyRoofBub").setAttribute("opacity", t > 500 ? 1 : 0);
+      $("cyRoofQ").setAttribute("opacity", t > 3600 ? 1 : 0);
+      $("cyRoofQ").setAttribute("transform", `translate(0,${Math.sin(t / 150) * 8})`);
+      $("cySuc2").querySelector(".sTail").setAttribute("transform", `rotate(${Math.sin(t / 200) * 10},30,-230)`);
+    });
+  });
+}
+
 /* ======== ВАРИАНТ 8: ёлка → чат → мега разработка → робот ======== */
 (() => {
   const C = ["#ff3b3b", "#ffd54a", "#4dfcff", "#ff4fd8", "#7dffb0"];
@@ -1712,7 +1898,8 @@ function runCafe() {
 let busy = false, showCount = 0;
 // все варианты по очереди, каждый запускается ровно раз в минуту
 const VARIANTS = [
-  runXmas,                                                                                 // ёлка и робот (новый — идёт первым)
+  async () => { show("cy"); await runCyber(); show("cyLove"); await sleep(5000); },        // 2077 (новый — идёт первым)
+  runXmas,                                                                                 // ёлка и робот
   async () => { show("vgText"); await vgTextRun(); show("vegas"); await vgStreetRun(); }, // Вегас
   async () => { show("cafe"); await runCafe(); },                                        // кафе
   async () => { show("hack"); await Promise.all([runRain(HACK_MS), typeTerm(HACK_MS)]);   // дельфин
