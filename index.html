@@ -4,6 +4,99 @@
 <meta charset="utf-8">
 <title>Dimon PRO Overlay</title>
 <style>
+  /* ===== ВАРИАНТ 2: дельфин (старое шоу) ===== */
+  :root { --green: #00ff66; --gold: #ffd54a; }
+  #term { font-family: "Consolas", "Courier New", monospace; }
+  /* ---------- 1. ХАКЕР ---------- */
+  #hack { background: #000; }
+  #rain { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #term {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(80vw, 1100px);
+    background: rgba(0, 10, 0, .85);
+    border: 2px solid var(--green);
+    box-shadow: 0 0 40px rgba(0,255,102,.5), inset 0 0 30px rgba(0,255,102,.15);
+    padding: 2.2vh 2.5vw;
+    color: var(--green);
+    font-size: clamp(16px, 2.6vw, 44px);
+    line-height: 1.35;
+    text-shadow: 0 0 8px var(--green);
+    min-height: 30vh;
+    white-space: pre-wrap;
+  }
+  #term .hdr { font-size: .5em; opacity: .7; margin-bottom: 1vh; }
+  #term .red { color: #ff3355; text-shadow: 0 0 10px #ff3355; }
+  #term .gold { color: var(--gold); text-shadow: 0 0 12px var(--gold); }
+  .cursor { display: inline-block; width: .6em; background: var(--green); animation: blink .6s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  #hack.glitch { animation: glitch .12s steps(2) 3; }
+  @keyframes glitch {
+    0% { transform: translate(0,0); filter: hue-rotate(0); }
+    50% { transform: translate(-8px, 4px); filter: hue-rotate(90deg); }
+    100% { transform: translate(6px,-3px); filter: hue-rotate(-60deg); }
+  }
+
+  /* ---------- 2. ДОЛЛАРОВЫЙ ДЕЛЬФИН ---------- */
+  #sea {
+    background: linear-gradient(#020b06 0%, #04311a 55%, #0a4d2a 100%);
+  }
+  #moneyrain { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #waves { position: absolute; left: 0; bottom: 0; width: 100%; height: 32vh; }
+  #dolphin {
+    position: absolute; left: 0; top: 0;
+    width: 34vw; height: auto;
+    transform-origin: 50% 50%;
+    filter: drop-shadow(0 0 18px rgba(255,213,74,.7));
+    will-change: transform;
+  }
+  .bill {
+    position: absolute; font-weight: 900; color: var(--gold);
+    text-shadow: 0 0 10px #ffb300, 0 0 2px #000;
+    pointer-events: none; will-change: transform, opacity;
+  }
+  #seaTitle {
+    position: absolute; top: 6vh; width: 100%; text-align: center;
+    color: var(--gold); font-weight: 900;
+    font-size: clamp(22px, 4vw, 70px);
+    font-family: Impact, "Arial Black", sans-serif; letter-spacing: .05em;
+    text-shadow: 0 0 20px #ffb300, 3px 3px 0 #000;
+  }
+
+  /* ---------- 3. PRO ---------- */
+  #pro {
+    background: radial-gradient(circle at 50% 45%, #2a1f00 0%, #0b0700 55%, #000 100%);
+    display: none; align-items: center; justify-content: center; flex-direction: column;
+    text-align: center;
+  }
+  #pro.on { display: flex; }
+  #proWord {
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: clamp(120px, 26vw, 520px);
+    line-height: .9;
+    background: linear-gradient(180deg, #fff6c2 0%, #ffd54a 40%, #c78a00 70%, #fff1a1 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 40px rgba(255,200,0,.75)) drop-shadow(6px 8px 0 #000);
+    animation: slam .6s cubic-bezier(.2,1.6,.4,1) both;
+  }
+  #proSub {
+    margin-top: 3vh;
+    font-family: Impact, "Arial Black", sans-serif;
+    color: #fff; font-size: clamp(26px, 5.2vw, 100px);
+    text-shadow: 0 0 18px var(--gold), 4px 4px 0 #000;
+    opacity: 0; animation: rise .5s .55s ease-out forwards, shake .25s 1.2s 6;
+  }
+  #proSub b { color: var(--gold); }
+  @keyframes slam { 0% { transform: scale(4) rotate(-12deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+  @keyframes rise { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes shake { 0%,100% { translate: 0 0; } 25% { translate: -6px 3px; } 75% { translate: 6px -3px; } }
+  .shine {
+    position: absolute; inset: 0; pointer-events: none;
+    background: repeating-conic-gradient(from 0deg at 50% 45%, rgba(255,213,74,.10) 0 8deg, transparent 8deg 20deg);
+    animation: spin 12s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* ===== основное ===== */
   html, body {
     margin: 0; padding: 0; width: 100%; height: 100%;
     overflow: hidden;
@@ -46,6 +139,55 @@
 </head>
 <body>
 <div id="stage">
+
+  <!-- ===== ВАРИАНТ 2: хакер, дельфин, PRO ===== -->
+  <!-- 1 -->
+  <div class="phase" id="hack">
+    <canvas id="rain"></canvas>
+    <div id="term"></div>
+  </div>
+  <!-- 2 -->
+  <div class="phase" id="sea">
+    <canvas id="moneyrain"></canvas>
+    <div id="seaTitle">$$$ ДЕНЬГИ НЕ ВАЖНЫ, ВАЖЕН PRO $$$</div>
+    <svg id="waves" viewBox="0 0 1000 300" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1fbf5f"/>
+          <stop offset="1" stop-color="#05331a"/>
+        </linearGradient>
+      </defs>
+      <path id="wave1" fill="url(#wg)" opacity=".9"/>
+      <path id="wave2" fill="#0d5f31" opacity=".95"/>
+    </svg>
+    <svg id="dolphin" viewBox="0 0 200 90">
+      <defs>
+        <pattern id="cash" width="9" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(-12)">
+          <rect width="9" height="11" fill="#1d7a3a"/>
+          <text x="1.5" y="9" font-size="10" font-weight="900" font-family="Arial" fill="#ffe27a">$</text>
+        </pattern>
+      </defs>
+      <!-- плавник -->
+      <path d="M98 28 C103 16 111 8 124 4 C119 14 119 23 124 32 Z" fill="url(#cash)" stroke="#ffd54a" stroke-width="1.6"/>
+      <!-- тело -->
+      <path d="M20 52 C40 32 90 24 140 33 C156 36 166 41 173 45 L194 47 C197 49 195 52 190 52 L171 54
+               C160 60 140 65 112 65 C102 71 94 77 86 80 C89 72 91 68 89 64
+               C70 62 52 60 36 59 L24 71 C19 74 14 72 16 67 L19 58 L6 53 C3 49 8 46 12 48 Z"
+            fill="url(#cash)" stroke="#ffd54a" stroke-width="1.8" stroke-linejoin="round"/>
+      <!-- глаз и улыбка -->
+      <circle cx="160" cy="42" r="2.6" fill="#000"/><circle cx="160.8" cy="41.2" r=".9" fill="#fff"/>
+      <path d="M176 50 Q182 53 188 51" stroke="#000" stroke-width="1.2" fill="none"/>
+      <!-- очки PRO -->
+      <rect x="152" y="38" width="13" height="7" rx="2" fill="#000" opacity=".85"/>
+      <text x="153.5" y="44" font-size="5" font-weight="900" fill="#ffd54a" font-family="Arial">PRO</text>
+    </svg>
+  </div>
+  <!-- 3 -->
+  <div class="phase" id="pro">
+    <div class="shine"></div>
+    <div id="proWord">PRO</div>
+    <div id="proSub">Я СТАЛ <b>ПРОФИ</b>. А ТЫ?</div>
+  </div>
 
   <!-- ===== СЦЕНА 1–2: Димон, качок, ноут ===== -->
   <div class="phase" id="story">
@@ -807,16 +949,181 @@ function runQueue() {
   });
 }
 
+/* ======== ВАРИАНТ 2: хакерский код → долларовый дельфин → PRO ======== */
+const HACK_MS     = 5000;  // сколько длится "хакерский код"
+const DOLPHIN_MS  = 4200;  // дельфин
+const PRO_MS      = 4500;  // надпись PRO
+
+const RAIN_PHRASES = [
+  "У МЕНЯ ТЕПЕРЬ GPT PRO АХАХАХАХА",
+  "ДИМОН КУПИЛ ПОДПИСКУ PRO",
+  "АХАХАХАХАХАХАХАХАХА",
+  "IQ ДИМОНА += 9000",
+  "БЕСПЛАТНАЯ ВЕРСИЯ УДАЛЕНА",
+  "ДИМОН ТЕПЕРЬ УМНЕЕ ВСЕХ",
+  "PRO PRO PRO PRO PRO",
+  "ЛИМИТЫ? НЕ СЛЫШАЛ",
+  "ВЫ ВСЁ ЕЩЁ НА FREE? АХАХА",
+];
+const TERM_LINES = [
+  ["",     "> подключение к серверу димона..."],
+  ["",     "> взлом бесплатной подписки... [####################] 100%"],
+  ["red",  "> ВНИМАНИЕ: ОБНАРУЖЕН ПРОФИ"],
+  ["gold", "> У МЕНЯ ТЕПЕРЬ GPT PRO АХАХАХХААХА"],
+  ["gold", "> ДИМОН КУПИЛ ПОДПИСКУ PRO"],
+];
+/* ---------- хакерский дождь из фраз ---------- */
+function runRain(ms) {
+  const c = $("rain"), ctx = c.getContext("2d");
+  const W = c.width = innerWidth, H = c.height = innerHeight;
+  const fs = Math.max(14, Math.round(W / 70));
+  const cols = Math.ceil(W / fs);
+  const drops = Array.from({ length: cols }, () => ({
+    y: Math.random() * -H / fs,
+    text: RAIN_PHRASES[Math.random() * RAIN_PHRASES.length | 0],
+    i: 0,
+  }));
+  ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+  ctx.font = `bold ${fs}px Consolas, monospace`;
+  const end = performance.now() + ms;
+  return new Promise(res => {
+    let last = 0;
+    (function frame(t) {
+      if (t > end) return res();
+      if (t - last > 45) {
+        last = t;
+        ctx.fillStyle = "rgba(0,0,0,0.09)"; ctx.fillRect(0, 0, W, H);
+        drops.forEach((d, x) => {
+          const ch = d.text[d.i % d.text.length];
+          ctx.fillStyle = Math.random() < .08 ? "#eaffea" : (Math.random() < .05 ? "#ffd54a" : "#00ff66");
+          ctx.fillText(ch, x * fs, d.y * fs);
+          d.y++; d.i++;
+          if (d.y * fs > H && Math.random() > .96) {
+            d.y = 0; d.i = 0;
+            d.text = RAIN_PHRASES[Math.random() * RAIN_PHRASES.length | 0];
+          }
+        });
+      }
+      requestAnimationFrame(frame);
+    })(0);
+  });
+}
+
+async function typeTerm(totalMs) {
+  const term = $("term");
+  term.innerHTML = '<div class="hdr">root@dimon-pc:~# ./become_pro.sh</div>';
+  const perLine = (totalMs - 600) / TERM_LINES.length;
+  for (const [cls, text] of TERM_LINES) {
+    const line = document.createElement("div");
+    if (cls) line.className = cls;
+    term.appendChild(line);
+    const cur = document.createElement("span"); cur.className = "cursor"; cur.innerHTML = "&nbsp;";
+    const perChar = Math.max(8, (perLine * .75) / text.length);
+    for (let i = 1; i <= text.length; i++) {
+      line.textContent = text.slice(0, i); line.appendChild(cur);
+      await sleep(perChar);
+    }
+    if (cls === "red") { $("hack").classList.remove("glitch"); void $("hack").offsetWidth; $("hack").classList.add("glitch"); }
+    await sleep(perLine * .25);
+    cur.remove();
+  }
+}
+
+/* ---------- море и дельфин ---------- */
+function wavePath(t, amp, base, k, phase) {
+  let d = `M0 300 L0 ${base}`;
+  for (let x = 0; x <= 1000; x += 20) d += ` L${x} ${base + Math.sin(x * k + t + phase) * amp}`;
+  return d + " L1000 300 Z";
+}
+
+function bill(x, y, size, vx, vy, life) {
+  const b = document.createElement("div");
+  b.className = "bill";
+  b.textContent = Math.random() < .5 ? "$" : "💵";
+  b.style.fontSize = size + "px";
+  $("sea").appendChild(b);
+  const t0 = performance.now();
+  (function f(t) {
+    const k = (t - t0) / life;
+    if (k >= 1) return b.remove();
+    const px = x + vx * k * life / 16, py = y + vy * k * life / 16 + 0.5 * 900 * (k * life / 1000) ** 2;
+    b.style.transform = `translate(${px}px, ${py}px) rotate(${k * 360 * Math.sign(vx)}deg)`;
+    b.style.opacity = 1 - k;
+    requestAnimationFrame(f);
+  })(t0);
+}
+
+function runSea(ms) {
+  const W = innerWidth, H = innerHeight;
+  const dol = $("dolphin");
+  const mc = $("moneyrain"), mctx = mc.getContext("2d");
+  mc.width = W; mc.height = H;
+  const coins = Array.from({ length: 60 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: 14 + Math.random() * 24, v: 1 + Math.random() * 3 }));
+  const seaLine = H * 0.74;
+  const jumpMs = 2600, startJump = 300;
+  const t0 = performance.now();
+  let splashed = false;
+  return new Promise(res => {
+    (function frame(now) {
+      const t = now - t0;
+      if (t > ms) { $("sea").querySelectorAll(".bill").forEach(b => b.remove()); return res(); }
+      // волны
+      $("wave1").setAttribute("d", wavePath(t / 400, 14, 110, 0.012, 0));
+      $("wave2").setAttribute("d", wavePath(t / 300, 10, 150, 0.016, 2));
+      // денежный дождь
+      mctx.clearRect(0, 0, W, H);
+      coins.forEach(c => {
+        c.y += c.v; if (c.y > H) { c.y = -30; c.x = Math.random() * W; }
+        mctx.font = `bold ${c.s}px Arial`; mctx.fillStyle = "rgba(255,213,74,.35)";
+        mctx.fillText("$", c.x, c.y);
+      });
+      // прыжок дельфина
+      const dw = dol.getBoundingClientRect().width || W * .34;
+      let k = Math.min(Math.max((t - startJump) / jumpMs, 0), 1);
+      const x0 = -dw * 0.9, x1 = W * 0.78;
+      const peak = H * 0.5;
+      const x = x0 + (x1 - x0) * k;
+      const y = seaLine - 4 * peak * k * (1 - k);
+      const dx = (x1 - x0), dy = -4 * peak * (1 - 2 * k);
+      const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+      dol.style.transform = `translate(${x - dw / 2}px, ${y - dw * 0.22}px) rotate(${ang}deg)`;
+      dol.style.opacity = k >= 1 ? 0 : 1;
+      if (k > 0 && k < 1 && Math.random() < .5) bill(x, y, 18 + Math.random() * 18, -2 - Math.random() * 3, -2 + Math.random() * 3, 1200);
+      if (k > 0.05 && k < 0.12 && Math.random() < .6) bill(x, seaLine, 26, (Math.random() - .5) * 8, -6 - Math.random() * 6, 1400);
+      if (k >= 1 && !splashed) {
+        splashed = true;
+        for (let i = 0; i < 70; i++) bill(x1, seaLine, 22 + Math.random() * 30, (Math.random() - .5) * 14, -8 - Math.random() * 12, 1600);
+      }
+      requestAnimationFrame(frame);
+    })(t0);
+  });
+}
+
+/* ---------- PRO ---------- */
+function runPro() {
+  const pro = $("pro");
+  const w = $("proWord"), s = $("proSub");
+  [w, s].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
+}
+
 /* ---------- шоу ---------- */
-let busy = false;
+let busy = false, showCount = 0; // варианты чередуются: дельфин, потом большое шоу, потом снова дельфин...
 async function playShow() {
   if (busy) return; busy = true;
-  show("story"); stage.classList.add("on");
-  await runStory();
-  show("txt"); await runText();
-  show("td"); await runTD(TD_MS);
-  show("wc"); await runWC();
-  show("queue"); await runQueue();
+  stage.classList.add("on");
+  if (showCount++ % 2 === 0) {
+    // вариант 2: хакерский код → долларовый дельфин → PRO
+    show("hack"); await Promise.all([runRain(HACK_MS), typeTerm(HACK_MS)]);
+    show("sea"); await runSea(DOLPHIN_MS);
+    show("pro"); runPro(); await sleep(PRO_MS);
+  } else {
+    // вариант 1: Димон и качок → надпись → tower defense → туалет → очередь
+    show("story"); await runStory();
+    show("txt"); await runText();
+    show("td"); await runTD(TD_MS);
+    show("wc"); await runWC();
+    show("queue"); await runQueue();
+  }
   stage.classList.remove("on");
   await sleep(450);
   show(null);
