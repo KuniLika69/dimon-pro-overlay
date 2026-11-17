@@ -133,6 +133,27 @@
   @keyframes pop  { from { transform: scale(0) rotate(-30deg); opacity: 0; } to { transform: scale(1) rotate(-6deg); opacity: 1; } }
   @keyframes wob  { 50% { translate: 0 -10px; } }
 
+  /* Димвроди: телефон и финал */
+  #mmPhone { background: rgba(8,8,14,.94); }
+  #mmPhone.on { display: flex; align-items: center; justify-content: center; }
+  .ph { width: min(46vh, 90vw); height: 90vh; background: #0f1218; border: 10px solid #222; border-radius: 48px; box-shadow: 0 0 0 4px #555, 0 0 60px rgba(255,47,109,.4); display: flex; flex-direction: column; overflow: hidden; font-family: "Segoe UI", Arial, sans-serif; }
+  .phTop { display: flex; gap: 1.4vh; align-items: center; padding: 3.5vh 2vh 1.5vh; background: #1b1f2a; }
+  .phAva { width: 6vh; height: 6vh; border-radius: 50%; background: #ff2f6d; display: grid; place-items: center; font-size: 3.6vh; }
+  .phName { color: #fff; font-weight: 800; font-size: 2.6vh; }
+  .phSt { color: #8bc34a; font-size: 1.7vh; }
+  #phBody { flex: 1; padding: 2vh 1.6vh; display: flex; flex-direction: column; gap: 1.4vh; justify-content: flex-end; overflow: hidden; }
+  .pm { max-width: 82%; padding: 1.2vh 1.6vh; border-radius: 2.2vh; font-size: 2.1vh; line-height: 1.3; color: #fff; animation: rise .25s ease-out; }
+  .pm.k { align-self: flex-start; background: #3a1f2b; border: 2px solid #ff2f6d; border-bottom-left-radius: .5vh; }
+  .pm.d { align-self: flex-end; background: #2f6fed; border-bottom-right-radius: .5vh; }
+  #mmEnd { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; background: radial-gradient(circle, rgba(40,25,0,.95), rgba(0,0,0,.97) 70%); opacity: 0; transition: opacity .3s; font-family: Impact, sans-serif; }
+  #mmEnd.on { opacity: 1; }
+  #mmEnd .m1 { font-size: clamp(90px, 18vw, 380px); line-height: .9; background: linear-gradient(180deg, #fff6c2, #ffd54a 45%, #c78a00 75%, #fff1a1); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(6px 8px 0 #000) drop-shadow(0 0 30px rgba(255,200,0,.7)); }
+  #mmEnd .m2 { color: #fff; font-size: clamp(30px, 5vw, 105px); text-shadow: 4px 4px 0 #000; }
+  #mmEnd .m3 { color: #7dffb0; font-size: clamp(22px, 3.4vw, 72px); margin-top: 2vh; text-shadow: 3px 3px 0 #000, 0 0 18px #00ff88; }
+  #mmEnd.on .m1 { animation: slam .55s cubic-bezier(.2,1.6,.4,1) both; }
+  #mmEnd.on .m2 { animation: rise .4s .5s both; }
+  #mmEnd.on .m3 { animation: rise .4s 1.1s both; }
+
   /* 2077: финальное сердце */
   #cyLove { background: radial-gradient(circle at 50% 50%, rgba(80,0,50,.95), rgba(0,0,0,.97) 70%); overflow: hidden; }
   #cyLove.on { display: flex; align-items: center; justify-content: center; }
@@ -491,6 +512,23 @@
         </g>
       </g>
     </svg>
+  </div>
+
+  <!-- ===== ВАРИАНТ 10: пузырь Димвроди ===== -->
+  <div class="phase" id="mmPhone">
+    <div class="ph">
+      <div class="phTop"><div class="phAva">😈</div><div><div class="phName">Кунилка</div><div class="phSt" id="phSt">в сети</div></div></div>
+      <div id="phBody"></div>
+    </div>
+  </div>
+  <div class="phase" id="mm">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block">
+      <g id="mmDrive"></g>
+      <g id="mmStore"></g>
+      <g id="mmGaz"></g>
+      <g id="mmBuild"></g>
+    </svg>
+    <div id="mmEnd"><div><div class="m1">МММ</div><div class="m2">Мега Мощная Модель</div><div class="m3">Я не халявщик — я партнёр GPT PRO!</div></div></div>
   </div>
 
   <!-- ===== ВАРИАНТ 9: 2077 ===== -->
@@ -1564,6 +1602,148 @@ function runCyber() {
   });
 }
 
+/* ======== ВАРИАНТ 10: пузырь Димвроди (переписка → Хаммер → Лурка Мерлен → Газель → пирамида) ======== */
+const wheel = (cx, r = 60) => `<g class="wheel" data-cx="${cx}"><circle cx="${cx}" cy="-10" r="${r}" fill="#111" stroke="#000" stroke-width="5"/><circle cx="${cx}" cy="-10" r="${r * .45}" fill="#9aa3ad"/><path d="M${cx - r * .45} -10 H${cx + r * .45} M${cx} ${-10 - r * .45} V${-10 + r * .45}" stroke="#555" stroke-width="6"/></g>`;
+const hummer = `
+  <ellipse cx="0" cy="0" rx="340" ry="18" fill="#000" opacity=".35"/>
+  <path d="M-320 -60 L-320 -190 L-200 -200 L-160 -320 L190 -320 L230 -200 L330 -190 L330 -60 Z" fill="#f2b705" stroke="#000" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M-145 -305 L-180 -205 L-10 -205 L-10 -305 Z M10 -305 L10 -205 L200 -205 L175 -305 Z" fill="#9fd3ff" stroke="#000" stroke-width="5"/>
+  <rect x="-150" y="-345" width="320" height="18" fill="#222"/>
+  <path d="M290 -180 V-90 M305 -180 V-90 M320 -180 V-90" stroke="#000" stroke-width="5"/>
+  <rect x="-340" y="-80" width="680" height="30" rx="8" fill="#222"/>
+  <rect x="-70" y="-150" width="130" height="38" rx="5" fill="#fff" stroke="#000" stroke-width="3"/>
+  <text x="-5" y="-121" text-anchor="middle" font-size="26" font-family="Impact" fill="#000">МММ 777</text>
+  ${wheel(-210, 72)}${wheel(210, 72)}`;
+const gazel = `
+  <ellipse cx="0" cy="0" rx="360" ry="18" fill="#000" opacity=".35"/>
+  <rect x="-360" y="-340" width="470" height="290" rx="8" fill="#e9eef3" stroke="#000" stroke-width="7"/>
+  <text x="-125" y="-245" text-anchor="middle" font-size="46" font-family="Impact" fill="#1565c0">ГРУЗ:</text>
+  <text x="-125" y="-185" text-anchor="middle" font-size="46" font-family="Impact" fill="#c62828">ПИРАМИДА 🔺</text>
+  <text x="-125" y="-120" text-anchor="middle" font-size="28" font-family="Segoe UI, Arial" font-weight="900" fill="#333">кирпичи · нейроны · видеокарты</text>
+  <path d="M110 -50 L110 -250 L230 -250 L330 -150 L340 -50 Z" fill="#1e88e5" stroke="#000" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M130 -235 L220 -235 L300 -160 L130 -160 Z" fill="#9fd3ff" stroke="#000" stroke-width="5"/>
+  <text x="225" y="-85" text-anchor="middle" font-size="30" font-family="Impact" fill="#fff">ГАЗЕЛЬ</text>
+  <rect x="-370" y="-70" width="720" height="26" rx="6" fill="#333"/>
+  ${wheel(-240, 58)}${wheel(-100, 58)}${wheel(230, 58)}`;
+$("mmDrive").innerHTML = `
+  <rect x="0" y="1000" width="1920" height="80" fill="#2b2b2b" opacity=".85"/><path d="M0 1040 H1920" stroke="#fff" stroke-width="6" stroke-dasharray="60 40"/>
+  <g transform="translate(1300,0)">
+    <rect x="0" y="420" width="600" height="580" fill="#f4f1ea" stroke="#000" stroke-width="6"/>
+    <rect x="0" y="420" width="600" height="130" fill="#ff7a00" stroke="#000" stroke-width="6"/>
+    <path d="M40 520 L90 455 L140 520 Z" fill="#fff" stroke="#000" stroke-width="4"/><rect x="72" y="490" width="36" height="30" fill="#ff7a00"/>
+    <text x="370" y="508" text-anchor="middle" font-size="58" font-family="Impact" fill="#fff" stroke="#000" stroke-width="2">ЛУРКА МЕРЛЕН</text>
+    <rect x="200" y="760" width="200" height="240" fill="#9fd3ff" stroke="#000" stroke-width="5"/><path d="M300 760 V1000" stroke="#000" stroke-width="4"/>
+    <text x="300" y="640" text-anchor="middle" font-size="36" font-family="Segoe UI, Arial" font-weight="900" fill="#333">всё для стройки</text>
+    <text x="300" y="690" text-anchor="middle" font-size="36" font-family="Segoe UI, Arial" font-weight="900" fill="#c62828">и пирамид 🔺</text>
+  </g>
+  <g id="mmHum">${hummer}</g>
+  <text id="mmHumFx" x="0" y="640" font-size="80" font-family="Impact" fill="#ffe066" stroke="#000" stroke-width="4">БРРРРУМ!</text>`;
+$("mmStore").innerHTML = `
+  ${[0, 1, 2].map(r => `<rect x="80" y="${330 + r * 170}" width="1760" height="20" fill="#8d6e63" stroke="#000" stroke-width="4"/>
+    ${Array.from({ length: 16 }, (_, i) => `<rect x="${110 + i * 108}" y="${250 + r * 170}" width="80" height="80" rx="6" fill="${["#ff7a00", "#90a4ae", "#a1887f", "#ffd54a"][(i + r) % 4]}" stroke="#000" stroke-width="3"/>`).join("")}`).join("")}
+  <g transform="translate(560,1030)">${person({ id: "mmD1", jacket: "#141428", pants: "#0d0d1a", hair: "#3a2416", extra: `<path d="M-22 -448 Q0 -436 24 -452" stroke="#000" stroke-width="5" fill="none"/><circle cx="-22" cy="-484" r="6" fill="#000"/><circle cx="22" cy="-484" r="6" fill="#000"/>` })}</g>
+  <g transform="translate(1440,1030) scale(-1,1)">${succubus("mmK1")}</g>
+  <g id="mmCart" transform="translate(960,1030)">
+    <path d="M-230 -330 L-200 -110 L210 -110 L250 -330 Z" fill="none" stroke="#555" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M-220 -260 H240 M-212 -190 H226 M-110 -330 L-100 -110 M10 -330 L10 -110 M130 -330 L120 -110" stroke="#777" stroke-width="5"/>
+    <path d="M250 -330 L300 -380" stroke="#555" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="-160" cy="-50" r="34" fill="#222"/><circle cx="170" cy="-50" r="34" fill="#222"/><path d="M-200 -110 L-160 -80 M210 -110 L170 -80" stroke="#555" stroke-width="8"/>
+    <g id="mmCartItems"></g>
+  </g>
+  <g id="mmFlyItems"></g>
+  <g id="mmReceipt" opacity="0" transform="translate(960,240)">
+    <rect x="-260" y="-110" width="520" height="190" rx="10" fill="#fff" stroke="#000" stroke-width="5"/>
+    <text x="0" y="-55" text-anchor="middle" font-size="40" font-family="Consolas, monospace" font-weight="900" fill="#111">🧾 ЧЕК</text>
+    <text x="0" y="0" text-anchor="middle" font-size="34" font-family="Consolas, monospace" fill="#111">кирпичи, нейроны...</text>
+    <text x="0" y="52" text-anchor="middle" font-size="40" font-family="Consolas, monospace" font-weight="900" fill="#c62828">ИТОГО: 13 000 ₽</text>
+  </g>`;
+$("mmGaz").innerHTML = `
+  <rect x="0" y="1000" width="1920" height="80" fill="#2b2b2b" opacity=".85"/><path d="M0 1040 H1920" stroke="#fff" stroke-width="6" stroke-dasharray="60 40"/>
+  <g id="mmGazV">${gazel}</g>
+  <text id="mmGazFx" x="0" y="560" font-size="70" font-family="Impact" fill="#ffe066" stroke="#000" stroke-width="4">ВЕЗЁМ ПИРАМИДУ!</text>`;
+const PYR = [["GPT", "PRO", "нейрон", "токен", "лимит"], ["PRO", "лайк", "GPT", "репост"], ["партнёр", "PRO", "друг"], ["хайп", "GPT"], ["ДИМВРОДИ"]];
+$("mmBuild").innerHTML = `
+  <rect x="0" y="1000" width="1920" height="80" fill="#c2a36b" opacity=".9"/>
+  <text x="960" y="110" text-anchor="middle" font-size="64" font-family="Impact" fill="#ffd54a" stroke="#000" stroke-width="3">ПИРАМИДА НЕЙРОСЕТЕЙ</text>
+  <text x="960" y="190" text-anchor="middle" font-size="76" font-family="Impact" fill="#fff" stroke="#000" stroke-width="3">«ПУЗЫРЬ ДИМВРОДИ» 🫧</text>
+  <g id="mmBlocks">${PYR.map((row, r) => row.map((lab, i) => {
+    const w = 230, h = 110, x = 960 - row.length * w / 2 + i * w, y = 1000 - (r + 1) * h;
+    return `<g class="mmB" data-y="${y}" transform="translate(0,-1200)"><rect x="${x + 4}" y="${y}" width="${w - 8}" height="${h - 6}" rx="8" fill="${r === 4 ? "url(#gold)" : ["#ff7a00", "#e64a19", "#f57c00", "#ffa000"][(i + r) % 4]}" stroke="#000" stroke-width="5"/>
+      <text x="${x + w / 2}" y="${y + 68}" text-anchor="middle" font-size="${r === 4 ? 40 : 44}" font-family="Impact" fill="${r === 4 ? "#3a2400" : "#fff"}" stroke="#000" stroke-width="${r === 4 ? 0 : 1.5}">${lab}</text></g>`;
+  }).join("")).join("")}</g>
+  <g transform="translate(260,1030)">${person({ id: "mmD2", jacket: "#141428", pants: "#0d0d1a", hair: "#3a2416", extra: `<path d="M-70 -520 Q0 -600 70 -520 Z" fill="#ffd54a" stroke="#000" stroke-width="4"/><rect x="-80" y="-524" width="160" height="16" rx="6" fill="#ffd54a" stroke="#000" stroke-width="3"/><path d="M-22 -448 Q0 -432 24 -452" stroke="#000" stroke-width="5" fill="none"/><circle cx="-22" cy="-484" r="6" fill="#000"/><circle cx="22" cy="-484" r="6" fill="#000"/>` })}</g>
+  <g transform="translate(1660,1030) scale(-1,1)">${succubus("mmK2")}</g>
+  <g id="mmBuildFx"></g>`;
+const MM_ITEMS = ["🧱 КИРПИЧИ", "🪣 ЦЕМЕНТ", "🧠 НЕЙРОНЫ (5 кг)", "🎮 ВИДЕОКАРТЫ", "🫧 ПУЗЫРИ"];
+function mmPhone() {
+  const body = $("phBody"); body.innerHTML = "";
+  const msgs = [["k", "Димон, наша нейросеть «Пузырь Димвроди» готова? 😈"], ["d", "Почти. Осталось построить пирамиду 🔺"],
+    ["k", "Каждый новый юзер приводит двух друзей? 👥👥"], ["d", "Да! И все получают GPT PRO... когда-нибудь 😎"],
+    ["k", "Нужны стройматериалы. Едем в Лурка Мерлен?"], ["d", "Заводи Хаммер 🚙💨"]];
+  return (async () => {
+    for (const [who, txt] of msgs) {
+      $("phSt").textContent = who === "k" ? "Кунилка печатает..." : "в сети";
+      await sleep(who === "k" ? 650 : 450);
+      body.insertAdjacentHTML("beforeend", `<div class="pm ${who}">${txt}</div>`);
+      $("phSt").textContent = "в сети";
+      await sleep(1050);
+    }
+    await sleep(500);
+  })();
+}
+function mmShow(id) { ["mmDrive", "mmStore", "mmGaz", "mmBuild"].forEach(g => $(g).setAttribute("display", g === id ? "inline" : "none")); }
+async function runMMM() {
+  $("mmEnd").classList.remove("on");
+  show("mmPhone"); await mmPhone();
+  show("mm");
+  // 1) Хаммер едет к Лурка Мерлен
+  mmShow("mmDrive");
+  await anim(4200, t => {
+    const k = clamp01(t / 3000), e = 1 - (1 - k) ** 2, x = lerp(-450, 950, e);
+    $("mmHum").setAttribute("transform", `translate(${x},1030) translate(0,${k < 1 ? Math.sin(t / 60) * 3 : 0})`);
+    spinWheels($("mmHum"), x);
+    $("mmHumFx").setAttribute("x", x - 700); $("mmHumFx").setAttribute("opacity", k < 1 ? 1 : 0);
+  });
+  // 2) покупки
+  mmShow("mmStore");
+  $("mmCartItems").innerHTML = ""; $("mmFlyItems").innerHTML = "";
+  const fly = MM_ITEMS.map(txt => { const g = document.createElementNS(SVGNS, "text"); g.textContent = txt; g.setAttribute("font-size", 44); g.setAttribute("font-family", "Segoe UI, Arial"); g.setAttribute("font-weight", 900); g.setAttribute("fill", "#fff"); g.setAttribute("stroke", "#000"); g.setAttribute("stroke-width", 1.5); g.setAttribute("text-anchor", "middle"); g.setAttribute("opacity", 0); $("mmFlyItems").appendChild(g); return g; });
+  await anim(6200, t => {
+    fly.forEach((g, i) => {
+      const k = clamp01((t - 300 - i * 850) / 700);
+      if (k <= 0) return;
+      const sx = i % 2 ? 1500 : 420, sy = 300 + (i % 3) * 120;
+      g.setAttribute("x", lerp(sx, 960 + (i - 2) * 70, k)); g.setAttribute("y", lerp(sy, 820 - i * 34, k) - Math.sin(k * Math.PI) * 160);
+      g.setAttribute("opacity", 1); g.setAttribute("font-size", lerp(44, 28, k));
+    });
+    $("mmK1").querySelector(".sTail").setAttribute("transform", `rotate(${Math.sin(t / 200) * 10},30,-230)`);
+    $("mmReceipt").setAttribute("opacity", t > 4700 ? 1 : 0);
+  });
+  // 3) Газель
+  mmShow("mmGaz");
+  await anim(4000, t => {
+    const x = lerp(-450, 2400, t / 4000);
+    $("mmGazV").setAttribute("transform", `translate(${x},1030) translate(0,${Math.sin(t / 70) * 3})`);
+    spinWheels($("mmGazV"), x);
+    $("mmGazFx").setAttribute("x", x - 330);
+  });
+  // 4) строим пирамиду
+  mmShow("mmBuild");
+  const blocks = [...document.querySelectorAll(".mmB")];
+  await anim(8000, t => {
+    blocks.forEach((b, i) => {
+      const k = clamp01((t - 200 - i * 330) / 380);
+      const bounce = k < 1 ? -1200 * (1 - k) ** 2 : 0;
+      b.setAttribute("transform", `translate(0,${bounce})`);
+    });
+    const shake = blocks.some((b, i) => { const d = t - 200 - i * 330 - 380; return d > 0 && d < 90; });
+    $("mmBuild").setAttribute("transform", shake ? `translate(${Math.random() * 10 - 5},${Math.random() * 8 - 4})` : "");
+    $("mmK2").querySelector(".sTail").setAttribute("transform", `rotate(${Math.sin(t / 200) * 10},30,-230)`);
+    $("mmK2").querySelector(".sArm").setAttribute("transform", `translate(60,-378) rotate(${-150 + Math.sin(t / 150) * 20})`);
+    if (t > 5600) $("mmEnd").classList.add("on");
+  });
+}
+
 /* ======== ВАРИАНТ 8: ёлка → чат → мега разработка → робот ======== */
 (() => {
   const C = ["#ff3b3b", "#ffd54a", "#4dfcff", "#ff4fd8", "#7dffb0"];
@@ -1898,7 +2078,8 @@ function runCafe() {
 let busy = false, showCount = 0;
 // все варианты по очереди, каждый запускается ровно раз в минуту
 const VARIANTS = [
-  async () => { show("cy"); await runCyber(); show("cyLove"); await sleep(5000); },        // 2077 (новый — идёт первым)
+  runMMM,                                                                                  // пузырь Димвроди (новый — идёт первым)
+  async () => { show("cy"); await runCyber(); show("cyLove"); await sleep(5000); },        // 2077
   runXmas,                                                                                 // ёлка и робот
   async () => { show("vgText"); await vgTextRun(); show("vegas"); await vgStreetRun(); }, // Вегас
   async () => { show("cafe"); await runCafe(); },                                        // кафе
