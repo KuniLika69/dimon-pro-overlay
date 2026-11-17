@@ -595,7 +595,7 @@
 
 <script>
 /* ======================= НАСТРОЙКИ ======================= */
-const EVERY_MS = 60000; // пауза (прозрачный фон) между шоу
+const EVERY_MS = 60000; // новый вариант каждую минуту
 const FIRST_MS = 60000; // первое шоу через минуту после загрузки
 const STORY_MS = 16500; // Димон + качок
 const TEXT_MS  = 5500;  // "Димон PRO, а ты всё ещё гуглишь?"
@@ -1291,39 +1291,37 @@ function runCafe() {
 }
 
 /* ---------- шоу ---------- */
-let busy = false, showCount = 0; // варианты по очереди: кафе → дельфин → большое шоу → кафе...
+let busy = false, showCount = 0;
+// все варианты по очереди, каждый запускается ровно раз в минуту
+const VARIANTS = [
+  async () => { show("cafe"); await runCafe(); },                                        // кафе
+  async () => { show("hack"); await Promise.all([runRain(HACK_MS), typeTerm(HACK_MS)]);   // дельфин
+                show("sea"); await runSea(DOLPHIN_MS);
+                show("pro"); runPro(); await sleep(PRO_MS); },
+  async () => { show("story"); await runStory(); show("txt"); await runText(); },        // Димон и качок
+  async () => { show("td"); await runTD(TD_MS); },                                        // tower defense
+  async () => { show("wc"); await runWC(); },                                             // туалет
+  async () => { show("queue"); await runQueue(); },                                       // очередь
+];
 async function playShow() {
   if (busy) return; busy = true;
   stage.classList.add("on");
-  const variant = showCount++ % 3;
-  if (variant === 0) {
-    // вариант 3: кафе
-    show("cafe"); await runCafe();
-  } else if (variant === 1) {
-    // вариант 2: хакерский код → долларовый дельфин → PRO
-    show("hack"); await Promise.all([runRain(HACK_MS), typeTerm(HACK_MS)]);
-    show("sea"); await runSea(DOLPHIN_MS);
-    show("pro"); runPro(); await sleep(PRO_MS);
-  } else {
-    // вариант 1: Димон и качок → надпись → tower defense → туалет → очередь
-    show("story"); await runStory();
-    show("txt"); await runText();
-    show("td"); await runTD(TD_MS);
-    show("wc"); await runWC();
-    show("queue"); await runQueue();
-  }
+  await VARIANTS[showCount++ % VARIANTS.length]();
   stage.classList.remove("on");
   await sleep(450);
   show(null);
   busy = false;
 }
 
-// если страница только что сама обновилась на новую версию — показываем новое шоу сразу
+// если страница только что сама обновилась на новую версию — показываем сразу
 const JUST_UPDATED = new URLSearchParams(location.search).has("v");
-// шоу → минута прозрачного фона → шоу → ...
 (async () => {
   await sleep(JUST_UPDATED ? 1500 : FIRST_MS);
-  while (true) { await playShow(); await sleep(EVERY_MS); }
+  while (true) {
+    const start = performance.now();
+    await playShow();
+    await sleep(Math.max(0, EVERY_MS - (performance.now() - start))); // следующий — через минуту после начала этого
+  }
 })();
 
 /* ---------- автообновление ----------
