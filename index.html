@@ -4,348 +4,477 @@
 <meta charset="utf-8">
 <title>Dimon PRO Overlay</title>
 <style>
-  /* ===== НАСТРОЙКИ — меняй тут ===== */
-  :root {
-    --green: #00ff66;
-    --gold: #ffd54a;
-  }
   html, body {
     margin: 0; padding: 0; width: 100%; height: 100%;
     overflow: hidden;
-    background: transparent; /* прозрачно между показами — стрим видно */
-    font-family: "Consolas", "Courier New", monospace;
+    background: transparent; /* прозрачно — стрим видно */
+    font-family: Impact, "Arial Black", sans-serif;
   }
-  #stage {
-    position: fixed; inset: 0;
-    opacity: 0; pointer-events: none;
-    transition: opacity .35s ease;
-  }
+  #stage { position: fixed; inset: 0; opacity: 0; pointer-events: none; transition: opacity .4s ease; }
   #stage.on { opacity: 1; }
   .phase { position: absolute; inset: 0; display: none; }
   .phase.on { display: block; }
 
-  /* ---------- 1. ХАКЕР ---------- */
-  #hack { background: #000; }
-  #rain { position: absolute; inset: 0; width: 100%; height: 100%; }
-  #term {
-    position: absolute; left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
-    width: min(80vw, 1100px);
-    background: rgba(0, 10, 0, .85);
-    border: 2px solid var(--green);
-    box-shadow: 0 0 40px rgba(0,255,102,.5), inset 0 0 30px rgba(0,255,102,.15);
-    padding: 2.2vh 2.5vw;
-    color: var(--green);
-    font-size: clamp(16px, 2.6vw, 44px);
-    line-height: 1.35;
-    text-shadow: 0 0 8px var(--green);
-    min-height: 30vh;
-    white-space: pre-wrap;
-  }
-  #term .hdr { font-size: .5em; opacity: .7; margin-bottom: 1vh; }
-  #term .red { color: #ff3355; text-shadow: 0 0 10px #ff3355; }
-  #term .gold { color: var(--gold); text-shadow: 0 0 12px var(--gold); }
-  .cursor { display: inline-block; width: .6em; background: var(--green); animation: blink .6s steps(1) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-  #hack.glitch { animation: glitch .12s steps(2) 3; }
-  @keyframes glitch {
-    0% { transform: translate(0,0); filter: hue-rotate(0); }
-    50% { transform: translate(-8px, 4px); filter: hue-rotate(90deg); }
-    100% { transform: translate(6px,-3px); filter: hue-rotate(-60deg); }
-  }
+  /* сцена с Димоном — прозрачный фон */
+  #story svg { width: 100%; height: 100%; display: block; }
+  #bubText { font-family: "Comic Sans MS", "Segoe UI", Arial, sans-serif; font-weight: 900; }
 
-  /* ---------- 2. ДОЛЛАРОВЫЙ ДЕЛЬФИН ---------- */
-  #sea {
-    background: linear-gradient(#020b06 0%, #04311a 55%, #0a4d2a 100%);
+  /* надпись на весь экран */
+  #txt {
+    background: radial-gradient(circle at 50% 45%, rgba(40,28,0,.96), rgba(0,0,0,.97) 70%);
+    text-align: center; color: #fff;
   }
-  #moneyrain { position: absolute; inset: 0; width: 100%; height: 100%; }
-  #waves { position: absolute; left: 0; bottom: 0; width: 100%; height: 32vh; }
-  #dolphin {
-    position: absolute; left: 0; top: 0;
-    width: 34vw; height: auto;
-    transform-origin: 50% 50%;
-    filter: drop-shadow(0 0 18px rgba(255,213,74,.7));
-    will-change: transform;
-  }
-  .bill {
-    position: absolute; font-weight: 900; color: var(--gold);
-    text-shadow: 0 0 10px #ffb300, 0 0 2px #000;
-    pointer-events: none; will-change: transform, opacity;
-  }
-  #seaTitle {
-    position: absolute; top: 6vh; width: 100%; text-align: center;
-    color: var(--gold); font-weight: 900;
-    font-size: clamp(22px, 4vw, 70px);
-    font-family: Impact, "Arial Black", sans-serif; letter-spacing: .05em;
-    text-shadow: 0 0 20px #ffb300, 3px 3px 0 #000;
-  }
-
-  /* ---------- 3. PRO ---------- */
-  #pro {
-    background: radial-gradient(circle at 50% 45%, #2a1f00 0%, #0b0700 55%, #000 100%);
-    display: none; align-items: center; justify-content: center; flex-direction: column;
-    text-align: center;
-  }
-  #pro.on { display: flex; }
-  #proWord {
-    font-family: Impact, "Arial Black", sans-serif;
-    font-size: clamp(120px, 26vw, 520px);
-    line-height: .9;
-    background: linear-gradient(180deg, #fff6c2 0%, #ffd54a 40%, #c78a00 70%, #fff1a1 100%);
+  #txt.on { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .t1 {
+    font-size: clamp(70px, 14vw, 300px); line-height: .95;
+    background: linear-gradient(180deg, #fff6c2, #ffd54a 45%, #c78a00 75%, #fff1a1);
     -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 0 40px rgba(255,200,0,.75)) drop-shadow(6px 8px 0 #000);
-    animation: slam .6s cubic-bezier(.2,1.6,.4,1) both;
+    filter: drop-shadow(0 0 35px rgba(255,200,0,.8)) drop-shadow(6px 8px 0 #000);
+    animation: slam .55s cubic-bezier(.2,1.6,.4,1) both;
   }
-  #proSub {
-    margin-top: 3vh;
-    font-family: Impact, "Arial Black", sans-serif;
-    color: #fff; font-size: clamp(26px, 5.2vw, 100px);
-    text-shadow: 0 0 18px var(--gold), 4px 4px 0 #000;
-    opacity: 0; animation: rise .5s .55s ease-out forwards, shake .25s 1.2s 6;
-  }
-  #proSub b { color: var(--gold); }
-  @keyframes slam { 0% { transform: scale(4) rotate(-12deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
-  @keyframes rise { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
-  @keyframes shake { 0%,100% { translate: 0 0; } 25% { translate: -6px 3px; } 75% { translate: 6px -3px; } }
-  .shine {
-    position: absolute; inset: 0; pointer-events: none;
-    background: repeating-conic-gradient(from 0deg at 50% 45%, rgba(255,213,74,.10) 0 8deg, transparent 8deg 20deg);
-    animation: spin 12s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .t2 { font-size: clamp(30px, 5.5vw, 115px); margin-top: 2vh; text-shadow: 4px 4px 0 #000; opacity: 0; animation: rise .45s .7s ease-out forwards; }
+  .t3 { font-size: clamp(60px, 10vw, 210px); color: #ff3b3b; text-shadow: 0 0 25px #ff0000, 5px 5px 0 #000; opacity: 0; animation: pop .4s 1.5s cubic-bezier(.2,1.8,.4,1) forwards, wob .2s 1.9s 8; }
+  .t4 { font-size: clamp(26px, 4.4vw, 95px); color: #7dffb0; margin-top: 1.5vh; text-shadow: 0 0 20px #00ff88, 4px 4px 0 #000; opacity: 0; animation: rise .45s 2.4s ease-out forwards; }
+  @keyframes slam { 0% { transform: scale(4) rotate(-10deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+  @keyframes rise { from { transform: translateY(50px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes pop  { from { transform: scale(0) rotate(-30deg); opacity: 0; } to { transform: scale(1) rotate(-6deg); opacity: 1; } }
+  @keyframes wob  { 50% { translate: 0 -10px; } }
+
+  /* tower defense */
+  #td canvas { width: 100%; height: 100%; display: block; }
 </style>
 </head>
 <body>
 <div id="stage">
-  <!-- 1 -->
-  <div class="phase" id="hack">
-    <canvas id="rain"></canvas>
-    <div id="term"></div>
-  </div>
-  <!-- 2 -->
-  <div class="phase" id="sea">
-    <canvas id="moneyrain"></canvas>
-    <div id="seaTitle">$$$ ДЕНЬГИ НЕ ВАЖНЫ, ВАЖЕН PRO $$$</div>
-    <svg id="waves" viewBox="0 0 1000 300" preserveAspectRatio="none">
+
+  <!-- ===== СЦЕНА 1–2: Димон, качок, ноут ===== -->
+  <div class="phase" id="story">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#1fbf5f"/>
-          <stop offset="1" stop-color="#05331a"/>
+        <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff3a8"/><stop offset=".45" stop-color="#ffcc33"/>
+          <stop offset=".75" stop-color="#c98a00"/><stop offset="1" stop-color="#fff0a0"/>
         </linearGradient>
+        <radialGradient id="aura"><stop offset="0" stop-color="#4dff9a" stop-opacity=".55"/><stop offset="1" stop-color="#4dff9a" stop-opacity="0"/></radialGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
       </defs>
-      <path id="wave1" fill="url(#wg)" opacity=".9"/>
-      <path id="wave2" fill="#0d5f31" opacity=".95"/>
-    </svg>
-    <svg id="dolphin" viewBox="0 0 200 90">
-      <defs>
-        <pattern id="cash" width="9" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(-12)">
-          <rect width="9" height="11" fill="#1d7a3a"/>
-          <text x="1.5" y="9" font-size="10" font-weight="900" font-family="Arial" fill="#ffe27a">$</text>
-        </pattern>
-      </defs>
-      <!-- плавник -->
-      <path d="M98 28 C103 16 111 8 124 4 C119 14 119 23 124 32 Z" fill="url(#cash)" stroke="#ffd54a" stroke-width="1.6"/>
-      <!-- тело -->
-      <path d="M20 52 C40 32 90 24 140 33 C156 36 166 41 173 45 L194 47 C197 49 195 52 190 52 L171 54
-               C160 60 140 65 112 65 C102 71 94 77 86 80 C89 72 91 68 89 64
-               C70 62 52 60 36 59 L24 71 C19 74 14 72 16 67 L19 58 L6 53 C3 49 8 46 12 48 Z"
-            fill="url(#cash)" stroke="#ffd54a" stroke-width="1.8" stroke-linejoin="round"/>
-      <!-- глаз и улыбка -->
-      <circle cx="160" cy="42" r="2.6" fill="#000"/><circle cx="160.8" cy="41.2" r=".9" fill="#fff"/>
-      <path d="M176 50 Q182 53 188 51" stroke="#000" stroke-width="1.2" fill="none"/>
-      <!-- очки PRO -->
-      <rect x="152" y="38" width="13" height="7" rx="2" fill="#000" opacity=".85"/>
-      <text x="153.5" y="44" font-size="5" font-weight="900" fill="#ffd54a" font-family="Arial">PRO</text>
+
+      <g id="world">
+        <!-- ДИМОН -->
+        <g id="dima" transform="translate(560,0)">
+          <ellipse cx="0" cy="1000" rx="230" ry="22" fill="#000" opacity=".3"/>
+          <!-- лучи и искры от ноута (после апгрейда) -->
+          <g id="rays" transform="translate(0,866)" opacity="0"></g>
+          <!-- ноги лотосом -->
+          <path d="M-205 990 C-205 915 -60 895 0 935 C60 895 205 915 205 990 C120 1018 -120 1018 -205 990Z" fill="#2d3a4f" stroke="#111" stroke-width="5"/>
+          <ellipse cx="-95" cy="972" rx="34" ry="16" fill="#f1c39b" stroke="#111" stroke-width="4"/>
+          <ellipse cx="95" cy="972" rx="34" ry="16" fill="#f1c39b" stroke="#111" stroke-width="4"/>
+          <!-- тело -->
+          <path d="M-95 950 L-112 790 Q-100 728 0 724 Q100 728 112 790 L95 950 Z" fill="#3d7be0" stroke="#111" stroke-width="5"/>
+          <rect x="-24" y="700" width="48" height="34" fill="#e8b48c"/>
+          <!-- голова -->
+          <circle cx="-72" cy="655" r="16" fill="#f1c39b" stroke="#111" stroke-width="4"/>
+          <circle cx="72" cy="655" r="16" fill="#f1c39b" stroke="#111" stroke-width="4"/>
+          <circle cx="0" cy="650" r="72" fill="#f1c39b" stroke="#111" stroke-width="5"/>
+          <path d="M-74 640 Q-84 562 0 566 Q84 562 74 640 Q62 598 0 604 Q-52 598 -74 640Z" fill="#3a2416" stroke="#111" stroke-width="4"/>
+          <!-- лицо: думает -->
+          <g id="faceThink">
+            <path d="M-42 622 L-12 618" stroke="#111" stroke-width="6" stroke-linecap="round"/>
+            <path d="M14 612 L42 604" stroke="#111" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="-26" cy="645" r="12" fill="#fff" stroke="#111" stroke-width="3"/>
+            <circle cx="26" cy="645" r="12" fill="#fff" stroke="#111" stroke-width="3"/>
+            <circle id="pupL" cx="-26" cy="640" r="5" fill="#111"/>
+            <circle id="pupR" cx="26" cy="640" r="5" fill="#111"/>
+            <path d="M-14 690 Q4 684 20 692" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round"/>
+          </g>
+          <!-- лицо: в шоке -->
+          <g id="faceShock" display="none">
+            <path d="M-46 600 Q-28 588 -10 598" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <path d="M10 598 Q28 588 46 600" stroke="#111" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <circle cx="-28" cy="638" r="22" fill="#fff" stroke="#111" stroke-width="4"/>
+            <circle cx="28" cy="638" r="22" fill="#fff" stroke="#111" stroke-width="4"/>
+            <circle cx="-28" cy="638" r="5" fill="#111"/><circle cx="28" cy="638" r="5" fill="#111"/>
+            <ellipse cx="0" cy="694" rx="18" ry="24" fill="#5a0d0d" stroke="#111" stroke-width="4"/>
+            <path d="M62 600 q10 18 0 26 q-10 -8 0 -26z" fill="#6cc6ff" stroke="#111" stroke-width="2"/>
+            <text x="-160" y="560" font-size="80" fill="#ff3b3b" stroke="#000" stroke-width="3" font-family="Impact">!!!</text>
+          </g>
+          <!-- руки -->
+          <path d="M-92 800 Q-140 880 -60 908" stroke="#3d7be0" stroke-width="40" fill="none" stroke-linecap="round"/>
+          <path d="M92 800 Q140 880 60 908" stroke="#3d7be0" stroke-width="40" fill="none" stroke-linecap="round"/>
+          <!-- ноутбук -->
+          <g id="laptop">
+            <path d="M-155 930 L155 930 L175 952 L-175 952 Z" fill="#5b6470" stroke="#111" stroke-width="5"/>
+            <rect id="lid" x="-130" y="800" width="260" height="132" rx="10" fill="#9aa3ad" stroke="#111" stroke-width="5"/>
+            <circle id="lidLogo" cx="0" cy="866" r="15" fill="#dfe4ea"/>
+            <text id="lidPro" x="0" y="882" text-anchor="middle" font-size="46" font-family="Impact" fill="#1a1200" display="none">GPT PRO</text>
+          </g>
+          <g id="sparks" transform="translate(0,866)"></g>
+        </g>
+
+        <!-- КАЧОК GPT PRO (точка отсчёта — ступни) -->
+        <g id="giant" transform="translate(2400,1035)">
+          <g id="gInner">
+            <ellipse cx="0" cy="-450" rx="420" ry="560" fill="url(#aura)"/>
+            <ellipse cx="0" cy="0" rx="200" ry="22" fill="#000" opacity=".3"/>
+            <!-- задняя рука -->
+            <g id="gArmB">
+              <ellipse cx="235" cy="-620" rx="62" ry="115" fill="#b97440" stroke="#111" stroke-width="6"/>
+              <ellipse cx="252" cy="-470" rx="52" ry="92" fill="#c98a4e" stroke="#111" stroke-width="6"/>
+              <circle cx="258" cy="-375" r="52" fill="#c98a4e" stroke="#111" stroke-width="6"/>
+            </g>
+            <!-- ноги -->
+            <g id="gLegB"><rect x="20" y="-340" width="80" height="330" rx="35" fill="#b97440" stroke="#111" stroke-width="6"/><ellipse cx="50" cy="-10" rx="70" ry="28" fill="#111"/></g>
+            <g id="gLegF"><rect x="-100" y="-340" width="80" height="330" rx="35" fill="#c98a4e" stroke="#111" stroke-width="6"/><ellipse cx="-70" cy="-10" rx="70" ry="28" fill="#111"/></g>
+            <rect x="-120" y="-420" width="240" height="120" rx="20" fill="#222" stroke="#111" stroke-width="6"/>
+            <!-- торс -->
+            <path d="M-210 -765 Q0 -810 210 -765 L135 -400 L-135 -400 Z" fill="#c98a4e" stroke="#111" stroke-width="7"/>
+            <path d="M-150 -748 L150 -748 L122 -410 L-122 -410 Z" fill="#111"/>
+            <text x="0" y="-610" text-anchor="middle" font-size="86" font-family="Impact" fill="url(#gold)" filter="url(#glow)">GPT</text>
+            <text x="0" y="-515" text-anchor="middle" font-size="86" font-family="Impact" fill="url(#gold)" filter="url(#glow)">PRO</text>
+            <circle cx="-205" cy="-735" r="78" fill="#c98a4e" stroke="#111" stroke-width="6"/>
+            <circle cx="205" cy="-735" r="78" fill="#b97440" stroke="#111" stroke-width="6"/>
+            <!-- шея и голова -->
+            <rect x="-52" y="-835" width="104" height="80" fill="#c98a4e" stroke="#111" stroke-width="6"/>
+            <circle cx="0" cy="-880" r="64" fill="#c98a4e" stroke="#111" stroke-width="6"/>
+            <path d="M-62 -895 Q-60 -950 0 -948 Q60 -950 62 -895 Q40 -925 0 -922 Q-40 -925 -62 -895Z" fill="#2a1a0c"/>
+            <path d="M-44 -898 L-10 -886 M44 -898 L10 -886" stroke="#111" stroke-width="9" stroke-linecap="round"/>
+            <circle cx="-24" cy="-874" r="7" fill="#111"/><circle cx="24" cy="-874" r="7" fill="#111"/>
+            <path d="M-30 -846 Q0 -830 30 -846 L26 -838 Q0 -826 -26 -838Z" fill="#fff" stroke="#111" stroke-width="4"/>
+            <!-- передняя рука -->
+            <g id="gArmF">
+              <ellipse cx="-235" cy="-620" rx="64" ry="118" fill="#c98a4e" stroke="#111" stroke-width="6"/>
+              <path d="M-270 -660 Q-235 -700 -200 -660" stroke="#8a5428" stroke-width="5" fill="none"/>
+              <ellipse cx="-252" cy="-470" rx="54" ry="94" fill="#c98a4e" stroke="#111" stroke-width="6"/>
+              <circle cx="-258" cy="-375" r="54" fill="#c98a4e" stroke="#111" stroke-width="6"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- облако мыслей -->
+        <g id="bubble" opacity="0">
+          <circle cx="650" cy="565" r="13" fill="#fff" stroke="#111" stroke-width="4"/>
+          <circle cx="690" cy="522" r="20" fill="#fff" stroke="#111" stroke-width="4"/>
+          <rect x="640" y="300" width="700" height="175" rx="87" fill="#fff" stroke="#111" stroke-width="5"/>
+          <text id="bubText" x="990" y="408" text-anchor="middle" font-size="58" fill="#111"></text>
+        </g>
+      </g>
     </svg>
   </div>
-  <!-- 3 -->
-  <div class="phase" id="pro">
-    <div class="shine"></div>
-    <div id="proWord">PRO</div>
-    <div id="proSub">Я СТАЛ <b>ПРОФИ</b>. А ТЫ?</div>
-  </div>
+
+  <!-- ===== СЦЕНА 3: надпись ===== -->
+  <div class="phase" id="txt"></div>
+
+  <!-- ===== СЦЕНА 4: tower defense ===== -->
+  <div class="phase" id="td"><canvas id="tdc"></canvas></div>
 </div>
 
 <script>
 /* ======================= НАСТРОЙКИ ======================= */
-const EVERY_MS    = 60000; // как часто показывать (60000 = раз в минуту)
-const FIRST_MS    = 60000; // первый показ через минуту после запуска
-const HACK_MS     = 5000;  // сколько длится "хакерский код"
-const DOLPHIN_MS  = 4200;  // дельфин
-const PRO_MS      = 4500;  // надпись PRO
+const EVERY_MS = 60000; // шоу раз в минуту
+const FIRST_MS = 60000; // первое шоу через минуту после загрузки
+const STORY_MS = 16500; // Димон + качок
+const TEXT_MS  = 5500;  // "Димон PRO, а ты всё ещё гуглишь?"
+const TD_MS    = 13000; // tower defense
 
-const RAIN_PHRASES = [
-  "У МЕНЯ ТЕПЕРЬ GPT PRO АХАХАХАХА",
-  "ДИМОН КУПИЛ ПОДПИСКУ PRO",
-  "АХАХАХАХАХАХАХАХАХА",
-  "IQ ДИМОНА += 9000",
-  "БЕСПЛАТНАЯ ВЕРСИЯ УДАЛЕНА",
-  "ДИМОН ТЕПЕРЬ УМНЕЕ ВСЕХ",
-  "PRO PRO PRO PRO PRO",
-  "ЛИМИТЫ? НЕ СЛЫШАЛ",
-  "ВЫ ВСЁ ЕЩЁ НА FREE? АХАХА",
-];
-const TERM_LINES = [
-  ["",     "> подключение к серверу димона..."],
-  ["",     "> взлом бесплатной подписки... [####################] 100%"],
-  ["red",  "> ВНИМАНИЕ: ОБНАРУЖЕН ПРОФИ"],
-  ["gold", "> У МЕНЯ ТЕПЕРЬ GPT PRO АХАХАХХААХА"],
-  ["gold", "> ДИМОН КУПИЛ ПОДПИСКУ PRO"],
+const THOUGHTS = [
+  [800,  "Plus или Pro?.."],
+  [2400, "Хммммм..."],
+  [3900, "7 раз отмерь..."],
+  [5300, "РЕЖУУУУУУУУУУУ!"],
+  [6700, "...а нет, ещё подумаю"],
+  [8300, null],
+  [9300, "О_о кто это?!"],
+  [11000, null],
+  [12900, "ЧТООО?! НОУТ СТАЛ PRO!"],
 ];
 /* ========================================================= */
 
 const $ = id => document.getElementById(id);
 const stage = $("stage");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const show = id => { document.querySelectorAll(".phase").forEach(p => p.classList.toggle("on", p.id === id)); };
+const show = id => document.querySelectorAll(".phase").forEach(p => p.classList.toggle("on", p.id === id));
+const lerp = (a, b, k) => a + (b - a) * k;
+const clamp01 = k => Math.max(0, Math.min(1, k));
+const anim = (ms, fn) => new Promise(res => {
+  const t0 = performance.now();
+  (function f(now) { const t = now - t0; fn(Math.min(t, ms)); t < ms ? requestAnimationFrame(f) : res(); })(t0);
+});
+const SVGNS = "http://www.w3.org/2000/svg";
 
-/* ---------- хакерский дождь из фраз ---------- */
-function runRain(ms) {
-  const c = $("rain"), ctx = c.getContext("2d");
-  const W = c.width = innerWidth, H = c.height = innerHeight;
-  const fs = Math.max(14, Math.round(W / 70));
-  const cols = Math.ceil(W / fs);
-  const drops = Array.from({ length: cols }, () => ({
-    y: Math.random() * -H / fs,
-    text: RAIN_PHRASES[Math.random() * RAIN_PHRASES.length | 0],
-    i: 0,
-  }));
-  ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
-  ctx.font = `bold ${fs}px Consolas, monospace`;
-  const end = performance.now() + ms;
-  return new Promise(res => {
-    let last = 0;
-    (function frame(t) {
-      if (t > end) return res();
-      if (t - last > 45) {
-        last = t;
-        ctx.fillStyle = "rgba(0,0,0,0.09)"; ctx.fillRect(0, 0, W, H);
-        drops.forEach((d, x) => {
-          const ch = d.text[d.i % d.text.length];
-          ctx.fillStyle = Math.random() < .08 ? "#eaffea" : (Math.random() < .05 ? "#ffd54a" : "#00ff66");
-          ctx.fillText(ch, x * fs, d.y * fs);
-          d.y++; d.i++;
-          if (d.y * fs > H && Math.random() > .96) {
-            d.y = 0; d.i = 0;
-            d.text = RAIN_PHRASES[Math.random() * RAIN_PHRASES.length | 0];
-          }
-        });
+/* ---------- лучи и искры (создаём один раз) ---------- */
+for (let i = 0; i < 14; i++) {
+  const p = document.createElementNS(SVGNS, "polygon");
+  const a = i / 14 * Math.PI * 2, w = 0.11;
+  p.setAttribute("points", `0,0 ${Math.cos(a - w) * 520},${Math.sin(a - w) * 520} ${Math.cos(a + w) * 520},${Math.sin(a + w) * 520}`);
+  p.setAttribute("fill", "#ffd54a"); p.setAttribute("opacity", ".35");
+  $("rays").appendChild(p);
+}
+const sparks = [];
+for (let i = 0; i < 22; i++) {
+  const s = document.createElementNS(SVGNS, "text");
+  s.textContent = i % 3 ? "✦" : "$";
+  s.setAttribute("font-size", 30 + (i % 4) * 10);
+  s.setAttribute("fill", i % 2 ? "#ffe066" : "#7dffb0");
+  s.setAttribute("text-anchor", "middle");
+  s.setAttribute("opacity", 0);
+  $("sparks").appendChild(s); sparks.push(s);
+}
+
+function setBubble(text) {
+  const b = $("bubble"), t = $("bubText");
+  if (!text) { b.setAttribute("opacity", 0); return; }
+  b.setAttribute("opacity", 1);
+  t.removeAttribute("textLength"); t.removeAttribute("lengthAdjust");
+  t.textContent = text;
+  if (t.getComputedTextLength() > 620) { t.setAttribute("textLength", 620); t.setAttribute("lengthAdjust", "spacingAndGlyphs"); }
+}
+
+/* ---------- СЦЕНА 1–2 ---------- */
+function runStory() {
+  // сброс
+  $("faceThink").setAttribute("display", "inline");
+  $("faceShock").setAttribute("display", "none");
+  $("lid").setAttribute("fill", "#9aa3ad"); $("lid").removeAttribute("filter");
+  $("lidLogo").setAttribute("display", "inline");
+  $("lidPro").setAttribute("display", "none");
+  $("rays").setAttribute("opacity", 0);
+  sparks.forEach(s => s.setAttribute("opacity", 0));
+  setBubble(null);
+  let thoughtIdx = 0, upgraded = false;
+
+  const WALK0 = 8000, WALK1 = 11400, JUMP1 = 12800;
+  const GX0 = 2400, GX1 = 1330, GY = 1035;
+  const LID = { x: 560, y: 866 };
+
+  return anim(STORY_MS, t => {
+    // мысли
+    while (thoughtIdx < THOUGHTS.length && t >= THOUGHTS[thoughtIdx][0]) setBubble(THOUGHTS[thoughtIdx++][1]);
+    const bub = $("bubble");
+    const shout = t > 5300 && t < 6700; // "РЕЖУУУ" трясётся
+    bub.setAttribute("transform", shout ? `translate(${Math.random() * 14 - 7},${Math.random() * 14 - 7})` : "");
+
+    // глаза бегают, пока думает
+    $("pupL").setAttribute("cx", -26 + Math.sin(t / 380) * 5); $("pupR").setAttribute("cx", 26 + Math.sin(t / 380) * 5);
+    $("pupL").setAttribute("cy", 640 - Math.abs(Math.cos(t / 520)) * 3); $("pupR").setAttribute("cy", 640 - Math.abs(Math.cos(t / 520)) * 3);
+
+    // качок
+    const g = $("giant"), world = $("world");
+    let shake = "";
+    g.setAttribute("display", t >= WALK0 && t < JUMP1 ? "inline" : "none");
+    if (t < WALK0) {
+      g.setAttribute("transform", `translate(${GX0},${GY})`);
+    } else if (t < WALK1) {
+      const k = (t - WALK0) / (WALK1 - WALK0);
+      const step = (t - WALK0) / 280;
+      const swing = Math.sin(step * Math.PI) * 18;
+      const bob = Math.abs(Math.sin(step * Math.PI)) * 18;
+      g.setAttribute("transform", `translate(${lerp(GX0, GX1, k)},${GY - bob})`);
+      $("gLegF").setAttribute("transform", `rotate(${swing},-60,-340)`);
+      $("gLegB").setAttribute("transform", `rotate(${-swing},60,-340)`);
+      $("gArmF").setAttribute("transform", `rotate(${-swing * .8},-205,-735)`);
+      $("gArmB").setAttribute("transform", `rotate(${swing * .8},205,-735)`);
+      if (bob < 3) shake = `translate(${Math.random() * 16 - 8},${Math.random() * 10 - 5})`; // топот
+    } else if (t < JUMP1) {
+      // прыжок в ноутбук: уменьшается и крутится
+      const k = clamp01((t - WALK1) / (JUMP1 - WALK1));
+      const e = k * k;
+      const s = lerp(1, 0.02, e);
+      const cx = lerp(GX1, LID.x, k);
+      const cy = lerp(GY - 450, LID.y, k) - Math.sin(k * Math.PI) * 280;
+      g.setAttribute("transform", `translate(${cx},${cy}) scale(${s}) rotate(${-k * 540}) translate(0,450)`);
+      $("gLegF").setAttribute("transform", "rotate(-25,-60,-340)");
+      $("gLegB").setAttribute("transform", "rotate(25,60,-340)");
+      $("gArmF").setAttribute("transform", "rotate(60,-205,-735)");
+      $("gArmB").setAttribute("transform", "rotate(-60,205,-735)");
+    } else {
+      g.setAttribute("transform", `translate(${GX0},${GY})`);
+      if (!upgraded) {
+        upgraded = true;
+        $("faceThink").setAttribute("display", "none");
+        $("faceShock").setAttribute("display", "inline");
+        $("lid").setAttribute("fill", "url(#gold)"); $("lid").setAttribute("filter", "url(#glow)");
+        $("lidLogo").setAttribute("display", "none");
+        $("lidPro").setAttribute("display", "inline");
       }
-      requestAnimationFrame(frame);
-    })(0);
+      const u = t - JUMP1;
+      $("rays").setAttribute("opacity", Math.min(1, u / 300));
+      $("rays").setAttribute("transform", `translate(0,866) rotate(${u / 18})`);
+      sparks.forEach((s, i) => {
+        const ph = ((u / 1100) + i / sparks.length) % 1;
+        const a = i * 2.4;
+        s.setAttribute("x", Math.cos(a) * (60 + ph * 380));
+        s.setAttribute("y", Math.sin(a) * (40 + ph * 300));
+        s.setAttribute("opacity", 1 - ph);
+      });
+      if (u < 1500) shake = `translate(${Math.random() * 12 - 6},${Math.random() * 12 - 6})`;
+      // Димон подпрыгивает от шока
+      $("dima").setAttribute("transform", `translate(560,${-Math.abs(Math.sin(u / 160)) * (u < 1600 ? 30 : 0)})`);
+    }
+    world.setAttribute("transform", shake);
   });
 }
 
-async function typeTerm(totalMs) {
-  const term = $("term");
-  term.innerHTML = '<div class="hdr">root@dimon-pc:~# ./become_pro.sh</div>';
-  const perLine = (totalMs - 600) / TERM_LINES.length;
-  for (const [cls, text] of TERM_LINES) {
-    const line = document.createElement("div");
-    if (cls) line.className = cls;
-    term.appendChild(line);
-    const cur = document.createElement("span"); cur.className = "cursor"; cur.innerHTML = "&nbsp;";
-    const perChar = Math.max(8, (perLine * .75) / text.length);
-    for (let i = 1; i <= text.length; i++) {
-      line.textContent = text.slice(0, i); line.appendChild(cur);
-      await sleep(perChar);
+/* ---------- СЦЕНА 3 ---------- */
+function runText() {
+  $("txt").innerHTML = `
+    <div class="t1">ДИМОН PRO</div>
+    <div class="t2">А ТЫ ВСЁ ЕЩЁ ГУГЛИШЬ?</div>
+    <div class="t3">ХА!</div>
+    <div class="t4">CHAT GPT PRO — ПРОСТО КРУТО. ХА 😎</div>`;
+  return sleep(TEXT_MS);
+}
+
+/* ---------- СЦЕНА 4: tower defense ---------- */
+function runTD(ms) {
+  const c = $("tdc"), ctx = c.getContext("2d");
+  const W = c.width = innerWidth, H = c.height = innerHeight;
+  const P = [[-0.06, .3], [.3, .3], [.3, .72], [.64, .72], [.64, .38], [.9, .38]].map(([x, y]) => [x * W, y * H]);
+  const seg = []; let total = 0;
+  for (let i = 0; i < P.length - 1; i++) { const l = Math.hypot(P[i + 1][0] - P[i][0], P[i + 1][1] - P[i][1]); seg.push(l); total += l; }
+  const posAt = d => {
+    for (let i = 0; i < seg.length; i++) {
+      if (d <= seg[i]) { const k = d / seg[i]; return [lerp(P[i][0], P[i + 1][0], k), lerp(P[i][1], P[i + 1][1], k)]; }
+      d -= seg[i];
     }
-    if (cls === "red") { $("hack").classList.remove("glitch"); void $("hack").offsetWidth; $("hack").classList.add("glitch"); }
-    await sleep(perLine * .25);
-    cur.remove();
+    return P[P.length - 1];
+  };
+  const towers = [[.16, .52], [.47, .52], [.47, .14], [.8, .6], [.8, .17]].map(([x, y]) => ({ x: x * W, y: y * H, cd: Math.random() * 300, ang: 0, flash: 0 }));
+  const R = Math.min(W, H);
+  const range = R * .36, speed = total / 6.5;
+  let enemies = [], bullets = [], booms = [], pops = [], kills = 0, spawnT = 0;
+  const POPS = ["ХА!", "-1 DeepSeek", "PRO!", "БУМ", "ахахах", "не пройдёшь"];
+  const t0 = performance.now(); let last = t0;
+
+  function whale(x, y, s, hp, max) {
+    ctx.save(); ctx.translate(x, y);
+    ctx.fillStyle = "#4d6bfe"; ctx.strokeStyle = "#0b1a5c"; ctx.lineWidth = s * .08;
+    ctx.beginPath(); ctx.moveTo(-s * .9, 0); ctx.lineTo(-s * 1.45, -s * .45); ctx.lineTo(-s * 1.35, s * .35); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(0, 0, s, s * .6, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#c9d4ff"; ctx.beginPath(); ctx.ellipse(s * .1, s * .3, s * .65, s * .22, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(s * .55, -s * .15, s * .16, 0, 7); ctx.fill();
+    ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(s * .6, -s * .15, s * .08, 0, 7); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.font = `bold ${s * .5}px Arial`; ctx.textAlign = "center";
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 4; ctx.strokeText("DeepSeek", 0, -s * .95); ctx.fillText("DeepSeek", 0, -s * .95);
+    ctx.fillStyle = "#400"; ctx.fillRect(-s * .7, -s * .85, s * 1.4, s * .14);
+    ctx.fillStyle = "#3f3"; ctx.fillRect(-s * .7, -s * .85, s * 1.4 * hp / max, s * .14);
+    ctx.restore();
   }
-}
 
-/* ---------- море и дельфин ---------- */
-function wavePath(t, amp, base, k, phase) {
-  let d = `M0 300 L0 ${base}`;
-  for (let x = 0; x <= 1000; x += 20) d += ` L${x} ${base + Math.sin(x * k + t + phase) * amp}`;
-  return d + " L1000 300 Z";
-}
-
-function bill(x, y, size, vx, vy, life) {
-  const b = document.createElement("div");
-  b.className = "bill";
-  b.textContent = Math.random() < .5 ? "$" : "💵";
-  b.style.fontSize = size + "px";
-  $("sea").appendChild(b);
-  const t0 = performance.now();
-  (function f(t) {
-    const k = (t - t0) / life;
-    if (k >= 1) return b.remove();
-    const px = x + vx * k * life / 16, py = y + vy * k * life / 16 + 0.5 * 900 * (k * life / 1000) ** 2;
-    b.style.transform = `translate(${px}px, ${py}px) rotate(${k * 360 * Math.sign(vx)}deg)`;
-    b.style.opacity = 1 - k;
-    requestAnimationFrame(f);
-  })(t0);
-}
-
-function runSea(ms) {
-  const W = innerWidth, H = innerHeight;
-  const dol = $("dolphin");
-  const mc = $("moneyrain"), mctx = mc.getContext("2d");
-  mc.width = W; mc.height = H;
-  const coins = Array.from({ length: 60 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: 14 + Math.random() * 24, v: 1 + Math.random() * 3 }));
-  const seaLine = H * 0.74;
-  const jumpMs = 2600, startJump = 300;
-  const t0 = performance.now();
-  let splashed = false;
   return new Promise(res => {
     (function frame(now) {
-      const t = now - t0;
-      if (t > ms) { $("sea").querySelectorAll(".bill").forEach(b => b.remove()); return res(); }
-      // волны
-      $("wave1").setAttribute("d", wavePath(t / 400, 14, 110, 0.012, 0));
-      $("wave2").setAttribute("d", wavePath(t / 300, 10, 150, 0.016, 2));
-      // денежный дождь
-      mctx.clearRect(0, 0, W, H);
-      coins.forEach(c => {
-        c.y += c.v; if (c.y > H) { c.y = -30; c.x = Math.random() * W; }
-        mctx.font = `bold ${c.s}px Arial`; mctx.fillStyle = "rgba(255,213,74,.35)";
-        mctx.fillText("$", c.x, c.y);
+      const t = now - t0, dt = Math.min(50, now - last) / 1000; last = now;
+      // спавн
+      spawnT -= dt * 1000;
+      if (t < ms - 4500 && spawnT <= 0) { enemies.push({ d: 0, hp: 4, max: 4, wob: Math.random() * 6 }); spawnT = 520; }
+      enemies.forEach(e => { e.d += speed * dt; [e.x, e.y] = posAt(e.d); });
+      enemies = enemies.filter(e => {
+        if (e.d >= total) { pops.push({ x: e.x, y: e.y, txt: "БАЗА НЕ СДАЁТСЯ", t: 0 }); return false; }
+        return e.hp > 0;
       });
-      // прыжок дельфина
-      const dw = dol.getBoundingClientRect().width || W * .34;
-      let k = Math.min(Math.max((t - startJump) / jumpMs, 0), 1);
-      const x0 = -dw * 0.9, x1 = W * 0.78;
-      const peak = H * 0.5;
-      const x = x0 + (x1 - x0) * k;
-      const y = seaLine - 4 * peak * k * (1 - k);
-      const dx = (x1 - x0), dy = -4 * peak * (1 - 2 * k);
-      const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-      dol.style.transform = `translate(${x - dw / 2}px, ${y - dw * 0.22}px) rotate(${ang}deg)`;
-      dol.style.opacity = k >= 1 ? 0 : 1;
-      if (k > 0 && k < 1 && Math.random() < .5) bill(x, y, 18 + Math.random() * 18, -2 - Math.random() * 3, -2 + Math.random() * 3, 1200);
-      if (k > 0.05 && k < 0.12 && Math.random() < .6) bill(x, seaLine, 26, (Math.random() - .5) * 8, -6 - Math.random() * 6, 1400);
-      if (k >= 1 && !splashed) {
-        splashed = true;
-        for (let i = 0; i < 70; i++) bill(x1, seaLine, 22 + Math.random() * 30, (Math.random() - .5) * 14, -8 - Math.random() * 12, 1600);
+      // башни
+      towers.forEach(tw => {
+        tw.cd -= dt * 1000; tw.flash = Math.max(0, tw.flash - dt * 6);
+        let tgt = null, best = -1;
+        enemies.forEach(e => { if (Math.hypot(e.x - tw.x, e.y - tw.y) < range && e.d > best) { best = e.d; tgt = e; } });
+        if (tgt) {
+          tw.ang = Math.atan2(tgt.y - tw.y, tgt.x - tw.x);
+          if (tw.cd <= 0) { bullets.push({ x: tw.x, y: tw.y, e: tgt }); tw.cd = 260; tw.flash = 1; }
+        }
+      });
+      // пули
+      bullets = bullets.filter(b => {
+        if (!enemies.includes(b.e)) return false;
+        const dx = b.e.x - b.x, dy = b.e.y - b.y, dist = Math.hypot(dx, dy), v = R * 1.6 * dt;
+        if (dist < v + 8) {
+          b.e.hp--;
+          if (b.e.hp <= 0) {
+            kills++;
+            for (let i = 0; i < 14; i++) booms.push({ x: b.e.x, y: b.e.y, vx: (Math.random() - .5) * R, vy: (Math.random() - .7) * R, t: 0 });
+            pops.push({ x: b.e.x, y: b.e.y, txt: POPS[Math.random() * POPS.length | 0], t: 0 });
+          }
+          return false;
+        }
+        b.x += dx / dist * v; b.y += dy / dist * v; return true;
+      });
+
+      // --- рисуем ---
+      ctx.fillStyle = "#16301a"; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "rgba(255,255,255,.03)";
+      for (let x = 0; x < W; x += R * .06) for (let y = 0; y < H; y += R * .06) if ((x + y) / (R * .06) % 2 < 1) ctx.fillRect(x, y, R * .06, R * .06);
+      ctx.lineJoin = "round"; ctx.lineCap = "round";
+      ctx.strokeStyle = "#6e5230"; ctx.lineWidth = R * .11; ctx.beginPath(); P.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke();
+      ctx.strokeStyle = "#a5814b"; ctx.lineWidth = R * .085; ctx.stroke();
+      // база
+      const [bx, by] = P[P.length - 1];
+      ctx.fillStyle = "#ffcc33"; ctx.strokeStyle = "#000"; ctx.lineWidth = 5;
+      ctx.fillRect(bx, by - R * .12, R * .2, R * .2); ctx.strokeRect(bx, by - R * .12, R * .2, R * .2);
+      for (let i = 0; i < 4; i++) { ctx.fillRect(bx + i * R * .055, by - R * .17, R * .035, R * .05); ctx.strokeRect(bx + i * R * .055, by - R * .17, R * .035, R * .05); }
+      ctx.fillStyle = "#000"; ctx.font = `bold ${R * .04}px Impact, Arial`; ctx.textAlign = "center";
+      ctx.fillText("ДИМОН", bx + R * .1, by - R * .01); ctx.fillText("PRO", bx + R * .1, by + R * .045);
+      // враги
+      enemies.forEach(e => whale(e.x, e.y + Math.sin(t / 150 + e.wob) * 4, R * .045, e.hp, e.max));
+      // башни
+      towers.forEach(tw => {
+        const s = R * .05;
+        ctx.fillStyle = "#2b2b2b"; ctx.strokeStyle = "#000"; ctx.lineWidth = 4;
+        ctx.fillRect(tw.x - s, tw.y - s, s * 2, s * 2); ctx.strokeRect(tw.x - s, tw.y - s, s * 2, s * 2);
+        ctx.save(); ctx.translate(tw.x, tw.y); ctx.rotate(tw.ang);
+        ctx.fillStyle = "#ffd54a"; ctx.fillRect(0, -s * .2, s * 1.4, s * .4); ctx.strokeRect(0, -s * .2, s * 1.4, s * .4);
+        if (tw.flash > 0) { ctx.fillStyle = `rgba(255,255,180,${tw.flash})`; ctx.beginPath(); ctx.arc(s * 1.5, 0, s * .45 * tw.flash, 0, 7); ctx.fill(); }
+        ctx.restore();
+        ctx.fillStyle = "#10a37f"; ctx.beginPath(); ctx.arc(tw.x, tw.y, s * .75, 0, 7); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "#fff"; ctx.font = `bold ${s * .5}px Arial`; ctx.fillText("GPT", tw.x, tw.y + s * .18);
+        ctx.fillStyle = "#ffd54a"; ctx.font = `bold ${s * .42}px Impact, Arial`; ctx.fillText("PRO", tw.x, tw.y + s * 1.45);
+      });
+      // пули
+      bullets.forEach(b => {
+        ctx.fillStyle = "#fff59d"; ctx.shadowColor = "#ffd54a"; ctx.shadowBlur = 15;
+        ctx.beginPath(); ctx.arc(b.x, b.y, R * .008, 0, 7); ctx.fill(); ctx.shadowBlur = 0;
+      });
+      // взрывы
+      booms = booms.filter(p => {
+        p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += R * 2 * dt;
+        ctx.globalAlpha = Math.max(0, 1 - p.t / .7); ctx.fillStyle = Math.random() < .5 ? "#4d6bfe" : "#ffb300";
+        ctx.fillRect(p.x, p.y, R * .012, R * .012); ctx.globalAlpha = 1; return p.t < .7;
+      });
+      pops = pops.filter(p => {
+        p.t += dt;
+        ctx.globalAlpha = Math.max(0, 1 - p.t / 1); ctx.font = `bold ${R * .045}px Impact, Arial`;
+        ctx.fillStyle = "#ffe066"; ctx.strokeStyle = "#000"; ctx.lineWidth = 6;
+        ctx.strokeText(p.txt, p.x, p.y - p.t * R * .12); ctx.fillText(p.txt, p.x, p.y - p.t * R * .12);
+        ctx.globalAlpha = 1; return p.t < 1;
+      });
+      // HUD
+      ctx.textAlign = "left"; ctx.font = `bold ${R * .055}px Impact, Arial`; ctx.lineWidth = 7;
+      ctx.strokeStyle = "#000"; ctx.fillStyle = "#ffd54a";
+      ctx.strokeText("GPT PRO TOWER DEFENSE", W * .02, R * .08); ctx.fillText("GPT PRO TOWER DEFENSE", W * .02, R * .08);
+      ctx.textAlign = "right"; ctx.fillStyle = "#fff";
+      const kt = `DeepSeek сбито: ${kills}`;
+      ctx.strokeText(kt, W * .98, R * .08); ctx.fillText(kt, W * .98, R * .08);
+      if (t > ms - 2600) {
+        ctx.textAlign = "center"; ctx.font = `bold ${R * .14}px Impact, Arial`; ctx.lineWidth = 10;
+        const sc = 1 + Math.max(0, 1 - (t - (ms - 2600)) / 300) * 2;
+        ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(sc, sc);
+        ctx.strokeText("ПОБЕДА PRO 🏆", 0, 0); ctx.fillStyle = "#ffd54a"; ctx.fillText("ПОБЕДА PRO 🏆", 0, 0);
+        ctx.restore();
       }
-      requestAnimationFrame(frame);
+      t < ms ? requestAnimationFrame(frame) : res();
     })(t0);
   });
-}
-
-/* ---------- PRO ---------- */
-function runPro() {
-  const pro = $("pro");
-  const w = $("proWord"), s = $("proSub");
-  [w, s].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
 }
 
 /* ---------- шоу ---------- */
 let busy = false;
 async function playShow() {
   if (busy) return; busy = true;
-  stage.classList.add("on");
-  show("hack");
-  await Promise.all([runRain(HACK_MS), typeTerm(HACK_MS)]);
-  show("sea");
-  await runSea(DOLPHIN_MS);
-  show("pro"); runPro();
-  await sleep(PRO_MS);
+  show("story"); stage.classList.add("on");
+  await runStory();
+  show("txt"); await runText();
+  show("td"); await runTD(TD_MS);
   stage.classList.remove("on");
-  await sleep(400);
+  await sleep(450);
   show(null);
   busy = false;
 }
