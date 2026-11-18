@@ -2759,10 +2759,10 @@ function nextVariant() {
   try { localStorage.setItem("dimonBag", JSON.stringify({ n: VARIANTS.length, bag: bagMem, last: lastMem })); } catch (e) {}
   return lastMem;
 }
-async function playShow() {
+async function playShow(idx) {
   if (busy) return; busy = true;
   stage.classList.add("on");
-  await VARIANTS[nextVariant()]();
+  await VARIANTS[idx ?? nextVariant()]();
   stage.classList.remove("on");
   await sleep(450);
   show(null);
@@ -2771,12 +2771,21 @@ async function playShow() {
 
 // если страница только что сама обновилась на новую версию — показываем сразу
 const JUST_UPDATED = new URLSearchParams(location.search).has("v");
+// Сначала — все варианты по порядку (от самого первого к самому новому) с паузой 20 сек между ними,
+// потом — случайный вариант каждые 2 минуты без повторов.
+const FIRST_PASS = [15, 16, 17, 18, 19, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]; // индексы VARIANTS в порядке создания
+const PASS_GAP_MS = 20000;
 (async () => {
-  await sleep(JUST_UPDATED ? 1500 : FIRST_MS);
+  await sleep(JUST_UPDATED ? 1500 : PASS_GAP_MS);
+  for (let i = 0; i < FIRST_PASS.length; i++) {
+    await playShow(FIRST_PASS[i]);
+    if (i < FIRST_PASS.length - 1) await sleep(PASS_GAP_MS);
+  }
+  await sleep(EVERY_MS);
   while (true) {
     const start = performance.now();
     await playShow();
-    await sleep(Math.max(0, EVERY_MS - (performance.now() - start))); // следующий — через 2 минуты после начала этого
+    await sleep(Math.max(0, EVERY_MS - (performance.now() - start))); // ровно раз в 2 минуты
   }
 })();
 
