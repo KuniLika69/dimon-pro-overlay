@@ -40,6 +40,36 @@
   #prompt b { color: #10a37f; font-family: Consolas, monospace; }
   #prompt::after { content: ""; position: absolute; left: 50%; bottom: -16px; border: 9px solid transparent; border-top-color: #000; transform: translateX(-50%); }
 
+  /* старый монитор по центру */
+  #crt { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: clamp(280px, 36vw, 700px); }
+  .crtCase { background: linear-gradient(160deg, #e8dfc8, #b9ad8f); border: 4px solid #5a5240; border-radius: 26px; padding: 6% 6% 9%; box-shadow: 0 18px 0 #6e6450, 0 24px 40px rgba(0,0,0,.5); position: relative; }
+  .crtCase::after { content: "GPT PRO 2000"; position: absolute; left: 7%; bottom: 2.5%; font: clamp(9px, .9vw, 16px) Impact, sans-serif; color: #5a5240; letter-spacing: .1em; }
+  .crtLed { position: absolute; right: 8%; bottom: 3.5%; width: 10px; height: 10px; border-radius: 50%; background: #39ff14; box-shadow: 0 0 10px #39ff14; animation: led 1.2s steps(2) infinite; }
+  @keyframes led { 50% { opacity: .3; } }
+  .crtScreen { position: relative; aspect-ratio: 4/3; background: radial-gradient(ellipse at center, #062b12 0%, #021306 75%, #000 100%); border-radius: 18px / 24px; overflow: hidden;
+               box-shadow: inset 0 0 40px rgba(0,0,0,.9), inset 0 0 8px #0f0; border: 6px solid #2b2618; }
+  .crtScreen::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 2px, transparent 2px 4px); pointer-events: none; z-index: 3; animation: flick .12s infinite; }
+  @keyframes flick { 50% { opacity: .85; } }
+  #crtText { position: absolute; inset: 4%; font: 600 clamp(8px, .95vw, 17px)/1.3 Consolas, "Courier New", monospace; color: #39ff14; text-shadow: 0 0 6px #39ff14; white-space: pre-wrap; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+  #crtText .r { color: #ff5252; text-shadow: 0 0 6px #ff5252; } #crtText .y { color: #ffe066; text-shadow: 0 0 6px #ffe066; }
+  .err { position: absolute; z-index: 2; width: 62%; background: #c0c0c0; border: 2px solid; border-color: #fff #404040 #404040 #fff; font: 700 clamp(8px, .85vw, 15px) Tahoma, Arial, sans-serif; color: #000;
+         animation: errPop .18s steps(2) both; box-shadow: 3px 3px 0 rgba(0,0,0,.5); }
+  .err .ttl { background: linear-gradient(90deg, #000080, #1084d0); color: #fff; padding: 2px 5px; display: flex; justify-content: space-between; }
+  .err .ttl span:last-child { background: #c0c0c0; color: #000; padding: 0 4px; border: 1px solid; border-color: #fff #404040 #404040 #fff; }
+  .err .bd { padding: 6px 8px; display: flex; gap: 6px; align-items: center; }
+  .err .ic { font-size: 1.8em; line-height: 1; }
+  .err .ok { display: block; margin: 0 auto 6px; width: 30%; text-align: center; border: 2px solid; border-color: #fff #404040 #404040 #fff; padding: 1px; }
+  @keyframes errPop { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* чиби-нейронки */
+  #agents { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+  .chibi { position: absolute; left: 0; top: 0; width: clamp(90px, 8vw, 150px); will-change: transform; }
+  .chibi svg { width: 100%; display: block; }
+  .chibi .tag { position: absolute; left: 50%; top: -14%; transform: translateX(-50%); white-space: nowrap; font: clamp(12px, 1.1vw, 20px) Impact, sans-serif; color: #fff; -webkit-text-stroke: 1px #000; text-shadow: 2px 2px 0 #000; }
+  .chibi .say { position: absolute; left: 50%; bottom: 112%; transform: translateX(-50%); width: max-content; max-width: clamp(160px, 16vw, 300px); background: #fff; border: 3px solid #000; border-radius: 14px; padding: 6px 10px;
+                font: 800 clamp(12px, 1.1vw, 20px) "Segoe UI", Arial, sans-serif; color: #111; text-align: center; opacity: 0; transition: opacity .2s; }
+  .chibi .say.on { opacity: 1; }
+
   /* статус (виден только в тест-режиме) */
   #status { position: fixed; top: 8px; left: 8px; font: 600 14px "Segoe UI", Arial; color: #fff; background: rgba(0,0,0,.6); padding: 4px 10px; border-radius: 8px; display: none; }
 </style>
@@ -47,6 +77,8 @@
 <body>
 <div id="stack"></div>
 <div id="status"></div>
+<div id="crt"><div class="crtCase"><div class="crtScreen"><div id="crtText"></div></div><div class="crtLed"></div></div></div>
+<div id="agents"></div>
 <div id="prompt"></div>
 <div id="box">
   <svg viewBox="0 0 400 400">
@@ -256,10 +288,11 @@ async function loadChannel() {
     if (c && c !== channel) { channel = c; connect(); }
   } catch (e) {}
 }
-if (params.get("channel")) { channel = params.get("channel").toLowerCase(); connect(); } else { loadChannel(); setInterval(loadChannel, 30000); }
+const CHAT_ON = false; // мемы на сообщения чата выключены (поставить true — включатся обратно)
+if (CHAT_ON) { if (params.get("channel")) { channel = params.get("channel").toLowerCase(); connect(); } else { loadChannel(); setInterval(loadChannel, 30000); } }
 
 /* ---------- тест-режим: ?test — фейковые сообщения ---------- */
-if (TEST) {
+if (TEST && CHAT_ON) {
   const NICKS = ["джункспро", "тода_делитни", "сжумс", "годинкофдиф", "бейбаБибис", "Кунилка", "VasyaPupkin", "xX_NoLimits_Xx"];
   const MSGS = ["димон привет", "а когда стрим про gpt?", "ахахах", "у меня deepseek и что", "покажи пельмени", "PRO или не PRO"];
   const COLORS = ["#FF4500", "#1E90FF", "#9ACD32", "#FF69B4", "#DAA520", "#00FF7F", ""];
@@ -376,6 +409,113 @@ function nextPrompt() {
   }
   setTimeout(() => { speak(); setInterval(speak, PROMPT_EVERY_MS); }, 3000);
 })();
+
+/* ---------- старый монитор: хакерский текст + смешные ошибки ---------- */
+const HACK_LINES = [
+  "[+] обход лимитов............ OK", "[+] подключение к GPT PRO..... OK", "sudo make me PRO", "> scanning neural net: 1337 нейронов",
+  "[*] загрузка пельменей в RAM: ████████ 100%", "[+] шифрование токенов AES-PRO-256", "> ping deepseek.local ... таймаут (обиделся)",
+  "[*] компиляция харизмы... 87%", "> ./ещё_круче.sh --force", "[+] прокачка промта до уровня БОГ", "0x7F4E 0xDEAD 0xBEEF 0xPRO 0x1337",
+  "[*] перехват лимитов у соседа... успешно", "> git push --force reality", "[+] Дима: authorized ✔", "[*] майнинг вайба... +13 000 ₽",
+  "> rm -rf /free_tier", "[+] установка скибиди-модуля... OK", "[*] анализ чата: 99% завидуют", "> while(true) { сделай_круче(); }",
+  "[+] обновление мозга до v6.999", "[*] токены: ∞   лимиты: нет   стыд: нет",
+];
+const ERRORS = [
+  ["💀", "ОШИБКА 404: мозг не найден"], ["⚠️", "Недостаточно токенов для мысли"], ["🔥", "GPT PRO перегрелся от пельменей"],
+  ["🐋", "DeepSeek пытается подключиться... ОТКЛОНЕНО"], ["😵", "Ошибка: слишком круто. Уменьшите крутость"], ["📡", "Обнаружен free-тариф в радиусе 5 м"],
+  ["🥟", "Segfault в пельмене №3"], ["🧠", "Закончилась память: 13 000 вкладок с промтами"], ["🛑", "Kernel panic: Дима сказал «ещё круче»"],
+  ["❌", "ERR_TOO_MUCH_PRO"], ["🤖", "Нейросеть ушла в отпуск. Перезвоните в 2077"], ["🙃", "Промт слишком гениальный. Не понял"],
+  ["💾", "Не удалось сохранить вайб: диск переполнен"], ["🕺", "Скибиди-драйвер не отвечает"], ["🔌", "Сервер упал от смеха"],
+  ["📉", "Курс токена обвалился: Дима потратил всё"], ["🧊", "Охлаждение: нужно больше пельменей"], ["🚫", "Доступ запрещён: вы не Дима"],
+  ["🤡", "Обнаружен промт «сделай красиво». Аварийная остановка"], ["⏳", "Ожидание ответа от мозга... 9999 сек"],
+];
+(() => {
+  const box = $("crtText"), screen = document.querySelector(".crtScreen");
+  let errBag = [];
+  const nextErr = () => { if (!errBag.length) { errBag = [...ERRORS]; for (let i = errBag.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [errBag[i], errBag[j]] = [errBag[j], errBag[i]]; } } return errBag.shift(); };
+  async function typeLine() {
+    const line = HACK_LINES[Math.random() * HACK_LINES.length | 0];
+    const div = document.createElement("div");
+    if (Math.random() < .12) div.className = "y";
+    box.appendChild(div);
+    for (let i = 1; i <= line.length; i++) { div.textContent = line.slice(0, i) + (i < line.length ? "█" : ""); await sleep(18); }
+    while (box.children.length > 22) box.firstChild.remove();
+  }
+  (async function loop() { while (true) { await typeLine(); await sleep(250 + Math.random() * 500); } })();
+  async function popError() {
+    const [ic, msg] = nextErr();
+    const e = document.createElement("div");
+    e.className = "err";
+    e.style.left = (5 + Math.random() * 30) + "%"; e.style.top = (8 + Math.random() * 45) + "%";
+    e.innerHTML = `<div class="ttl"><span>GPT PRO — ошибка</span><span>×</span></div><div class="bd"><span class="ic">${ic}</span><span>${esc(msg)}</span></div><span class="ok">OK</span>`;
+    screen.appendChild(e);
+    const red = document.createElement("div"); red.className = "r"; red.textContent = "!! " + msg.toUpperCase(); box.appendChild(red);
+    await sleep(2600 + Math.random() * 1200);
+    e.remove();
+  }
+  (async function errLoop() { await sleep(1500); while (true) { popError(); await sleep(3200 + Math.random() * 2500); } })();
+})();
+
+/* ---------- чиби-нейронки вылазят сверху раз в ~2 минуты ---------- */
+const AGENTS_EVERY_MS = 120000, AGENTS_FIRST_MS = 20000;
+const AGENTS = [["DeepSeek", "#4d6bfe"], ["Kimi", "#111111"], ["Qwen", "#7c4dff"], ["Gemini", "#4285f4"], ["Mistral", "#ff7000"],
+  ["Llama", "#0866ff"], ["Grok", "#555555"], ["GigaChat", "#21a038"], ["YandexGPT", "#fc3f1d"], ["Perplexity", "#20808d"], ["Copilot", "#0f6cbd"]];
+const AG_LINES1 = ["блин, как я сюда попал?", "это стрим Димы?! а где выход?", "мне сказали, тут бесплатно...", "я просто мимо проходил", "кто выключил свет в датацентре?",
+  "я галлюцинирую или тут пельмени?", "помогите, я застрял в OBS!", "меня обучали не для этого", "ой, тут камера?", "это что, 2077?"];
+const AG_LINES2 = ["у него PRO?! бежим!!!", "лимиты кончились, ухожу", "Дима, не бей!", "я пошёл обратно в облако", "мама, я на стриме!", "ой всё, я галлюцинирую",
+  "скажите DeepSeek, что я ушёл", "токенов нет, но вы держитесь", "АААА, СКИБИДИ!", "пока, чат!"];
+const chibiSVG = col => `<svg viewBox="0 0 120 140">
+  <ellipse cx="60" cy="136" rx="34" ry="5" fill="#000" opacity=".3"/>
+  <g class="legs"><rect class="lg1" x="42" y="104" width="12" height="28" rx="6" fill="${col}" stroke="#000" stroke-width="3"/><rect class="lg2" x="66" y="104" width="12" height="28" rx="6" fill="${col}" stroke="#000" stroke-width="3"/></g>
+  <rect x="36" y="80" width="48" height="34" rx="14" fill="${col}" stroke="#000" stroke-width="3"/>
+  <rect x="25" y="86" width="12" height="24" rx="6" fill="${col}" stroke="#000" stroke-width="3" class="ar1"/><rect x="83" y="86" width="12" height="24" rx="6" fill="${col}" stroke="#000" stroke-width="3" class="ar2"/>
+  <circle cx="60" cy="48" r="40" fill="${col}" stroke="#000" stroke-width="3"/>
+  <ellipse cx="60" cy="54" rx="30" ry="24" fill="#fff" opacity=".92"/>
+  <ellipse cx="48" cy="52" rx="7" ry="9" fill="#000"/><ellipse cx="72" cy="52" rx="7" ry="9" fill="#000"/>
+  <circle cx="50" cy="49" r="2.5" fill="#fff"/><circle cx="74" cy="49" r="2.5" fill="#fff"/>
+  <ellipse cx="60" cy="68" rx="6" ry="5" fill="#c62828"/>
+  <circle cx="38" cy="62" r="5" fill="#ff8fc7" opacity=".7"/><circle cx="82" cy="62" r="5" fill="#ff8fc7" opacity=".7"/>
+  <line x1="60" y1="8" x2="60" y2="-6" stroke="#000" stroke-width="3"/><circle cx="60" cy="-8" r="5" fill="#ffd54a" stroke="#000" stroke-width="2"/>
+</svg>`;
+let agBag = [];
+const pickAgents = n => { const out = []; while (out.length < n) { if (!agBag.length) { agBag = [...AGENTS]; for (let i = agBag.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [agBag[i], agBag[j]] = [agBag[j], agBag[i]]; } } out.push(agBag.shift()); } return out; };
+let l1Bag = [], l2Bag = [];
+const fromBag = (bag, src) => { if (!bag.length) bag.push(...[...src].sort(() => Math.random() - .5)); return bag.shift(); };
+function runChibi([name, col], idx) {
+  return new Promise(res => {
+    const el = document.createElement("div");
+    el.className = "chibi";
+    el.innerHTML = `<div class="say"></div><div class="tag">${esc(name)}</div>${chibiSVG(col)}`;
+    $("agents").appendChild(el);
+    const W = innerWidth, H = innerHeight, cw = el.offsetWidth || 120;
+    const groundY = H * (.62 + Math.random() * .2) - cw;
+    let x = W * (.2 + Math.random() * .6), y = -cw * 1.6, vx = 0, vy = 0;
+    const say = el.querySelector(".say"), lg1 = el.querySelector(".lg1"), lg2 = el.querySelector(".lg2");
+    const t0 = performance.now() + idx * 700;
+    let phase = "fall", talked = 0, dir = Math.random() < .5 ? -1 : 1, nextTurn = 0;
+    (function f(now) {
+      const t = now - t0;
+      if (t < 0) { el.style.transform = `translate(${x}px,${y}px)`; return requestAnimationFrame(f); }
+      if (phase === "fall") { vy += 0.9; y += vy; if (y >= groundY) { y = groundY; vy = -vy * .35; if (Math.abs(vy) < 2) { phase = "talk1"; talked = t; } } }
+      else if (phase === "talk1") { if (!say.classList.contains("on")) { say.textContent = fromBag(l1Bag, AG_LINES1); say.classList.add("on"); } if (t - talked > 2600) { say.classList.remove("on"); phase = "run"; talked = t; } }
+      else if (phase === "run") {
+        if (t > nextTurn) { dir = Math.random() < .5 ? -1 : 1; nextTurn = t + 600 + Math.random() * 900; }
+        x += dir * 7; x = Math.max(0, Math.min(W - cw, x));
+        y = groundY - Math.abs(Math.sin(t / 110)) * 26;
+        if (t - talked > 1800 && !say.classList.contains("on")) { say.textContent = fromBag(l2Bag, AG_LINES2); say.classList.add("on"); }
+        if (t - talked > 5200) { say.classList.remove("on"); phase = "exit"; dir = x < W / 2 ? -1 : 1; }
+      }
+      else if (phase === "exit") { x += dir * 14; y = groundY - Math.abs(Math.sin(t / 80)) * 30; if (x < -cw * 2 || x > W + cw) { el.remove(); return res(); } }
+      const sw = Math.sin(t / 70) * (phase === "run" || phase === "exit" ? 1 : 0);
+      lg1.setAttribute("transform", `rotate(${sw * 25},48,104)`); lg2.setAttribute("transform", `rotate(${-sw * 25},72,104)`);
+      el.style.transform = `translate(${x}px,${y}px) scaleX(${phase === "run" || phase === "exit" ? -dir : 1})`;
+      say.style.transform = `translateX(-50%) scaleX(${phase === "run" || phase === "exit" ? -dir : 1})`;
+      el.querySelector(".tag").style.transform = say.style.transform;
+      requestAnimationFrame(f);
+    })(performance.now());
+  });
+}
+async function agentsWave() { const n = 2 + (Math.random() * 3 | 0); await Promise.all(pickAgents(n).map((a, i) => runChibi(a, i))); }
+setTimeout(() => { agentsWave(); setInterval(agentsWave, AGENTS_EVERY_MS); }, AGENTS_FIRST_MS);
 
 /* ---------- автообновление: новая версия подхватывается сама, ссылка в OBS та же ---------- */
 let myVersion = null;
