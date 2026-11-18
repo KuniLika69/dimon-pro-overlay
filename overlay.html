@@ -89,6 +89,18 @@
   .cm b { display: block; font-size: .8em; opacity: .75; }
   @keyframes rise { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
 
+  /* звонок эйчара — внутри экрана старого монитора */
+  .crtScreen #call { position: absolute; inset: 0; right: auto; bottom: auto; top: auto; width: auto; border: none; border-radius: 0; z-index: 2; box-shadow: none;
+                     background: radial-gradient(ellipse at center, #0b3d1c 0%, #031a0a 80%); }
+  .crtScreen #call .cHead { padding: 2% 3%; }
+  .crtScreen #call .cAva { width: 13%; }
+  .crtScreen #call .cName { font-size: clamp(11px, 1.15vw, 22px); }
+  .crtScreen #call .cCo, .crtScreen #call .cTime { font-size: clamp(9px, .85vw, 16px); }
+  .crtScreen #call .cRing { font-size: clamp(13px, 1.5vw, 28px); padding: 10% 3%; text-shadow: 0 0 10px #ffd54a; }
+  .crtScreen #call #cLog { padding: 2% 3%; gap: 4%; }
+  .crtScreen #call .cm { font-size: clamp(9px, .95vw, 17px); padding: 1.5% 2.5%; }
+  .crtScreen.calling #crtText, .crtScreen.calling .err { visibility: hidden; }
+
   /* окно сериала справа */
   #serial { position: fixed; right: 1.5vw; top: 3vh; width: clamp(240px, 24vw, 460px); height: 46vh; background: rgba(10, 12, 20, .9); border: 3px solid #607d8b;
             border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; font-family: "Segoe UI", Arial, sans-serif; box-shadow: 0 0 24px rgba(0,0,0,.5); }
@@ -555,7 +567,7 @@ const ERRORS = [
     await sleep(2600 + Math.random() * 1200);
     e.remove();
   }
-  (async function errLoop() { await sleep(1500); while (true) { popError(); await sleep(3200 + Math.random() * 2500); } })();
+  (async function errLoop() { await sleep(1500); while (true) { if (!window.dimaOnCall) popError(); await sleep(3200 + Math.random() * 2500); } })();
 })();
 
 /* ---------- чиби-нейронки вылазят сверху раз в ~2 минуты ---------- */
@@ -912,8 +924,10 @@ function buildScript() {
   const order = ["greet", "dGreet", "offer", "dQ", "hrA", "dQ", "hrA", "raise", "dCond", "beg", "dRefuse", "raise", "dQ", "hrA", "beg", "dCond", "desperate", "dFinal", "bye"];
   return { name, co, lines: order.map(k => ({ who: k[0] === "d" && k !== "desperate" ? "dm" : "hr", text: f(pickL(k)) })) };
 }
+document.querySelector(".crtScreen").appendChild($("call"));
 async function hrCall() {
   const c = $("call"), sc = buildScript();
+  document.querySelector(".crtScreen").classList.add("calling");
   const hair = ["#3a2416", "#f5d06b", "#c0392b", "#111", "#8e5a2b", "#6a4c93"][Math.random() * 6 | 0];
   c.innerHTML = `<div class="cHead"><div class="cAva">${hrAva(hair, "#f6cfae")}</div><div><div class="cName">${esc(sc.name)} · HR</div><div class="cCo">«${esc(sc.co)}»</div></div><div class="cTime" id="cTime">📞</div></div>
     <div class="cRing" id="cRing">📞 ВХОДЯЩИЙ ЗВОНОК... ДИМА, ВОЗЬМИ!</div><div id="cLog"></div>`;
@@ -939,6 +953,7 @@ async function hrCall() {
   $("cTime").textContent = "звонок завершён";
   await sleep(2500);
   c.className = "";
+  document.querySelector(".crtScreen").classList.remove("calling");
   window.dimaOnCall = false;
   $("bxPhone").setAttribute("display", "none");
 }
