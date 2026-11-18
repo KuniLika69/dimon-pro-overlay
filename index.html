@@ -883,7 +883,7 @@
 
 <script>
 /* ======================= НАСТРОЙКИ ======================= */
-const EVERY_MS = 120000; // новый вариант каждые 2 минуты
+const EVERY_MS = 300000; // после первого круга — случайный вариант раз в 5 минут
 const FIRST_MS = 120000; // первое шоу через 2 минуты после загрузки
 const STORY_MS = 16500; // Димон + качок
 const TEXT_MS  = 5500;  // "Димон PRO, а ты всё ещё гуглишь?"
@@ -908,9 +908,21 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const show = id => document.querySelectorAll(".phase").forEach(p => p.classList.toggle("on", p.id === id));
 const lerp = (a, b, k) => a + (b - a) * k;
 const clamp01 = k => Math.max(0, Math.min(1, k));
+// Общий таймер анимаций.
+// - время никогда не бывает отрицательным (rAF может отдать метку чуть раньше старта — из-за этого замерзала погода);
+// - ошибка в одном кадре не останавливает анимацию;
+// - сцена в любом случае заканчивается вовремя, даже если кадры не идут (страховка от «зависания»).
 const anim = (ms, fn) => new Promise(res => {
   const t0 = performance.now();
-  (function f(now) { const t = now - t0; fn(Math.min(t, ms)); t < ms ? requestAnimationFrame(f) : res(); })(t0);
+  let finished = false;
+  const finish = () => { if (!finished) { finished = true; try { fn(ms); } catch (e) {} res(); } };
+  setTimeout(finish, ms + 500);
+  (function f(now) {
+    if (finished) return;
+    const t = Math.max(0, Math.min(ms, now - t0));
+    try { fn(t); } catch (e) { console.warn("кадр сцены:", e); }
+    now - t0 < ms ? requestAnimationFrame(f) : finish();
+  })(t0);
 });
 const SVGNS = "http://www.w3.org/2000/svg";
 
@@ -2762,7 +2774,10 @@ function nextVariant() {
 async function playShow(idx) {
   if (busy) return; busy = true;
   stage.classList.add("on");
-  await VARIANTS[idx ?? nextVariant()]();
+  try {
+    // страховка: вариант не может длиться дольше 90 сек и не может «повесить» всё шоу
+    await Promise.race([Promise.resolve().then(() => VARIANTS[idx ?? nextVariant()]()), sleep(90000)]);
+  } catch (e) { console.warn("вариант упал:", e); }
   stage.classList.remove("on");
   await sleep(450);
   show(null);
@@ -2771,12 +2786,13 @@ async function playShow(idx) {
 
 // если страница только что сама обновилась на новую версию — показываем сразу
 const JUST_UPDATED = new URLSearchParams(location.search).has("v");
-// Сначала — все варианты по порядку (от самого первого к самому новому) с паузой 20 сек между ними,
-// потом — случайный вариант каждые 2 минуты без повторов.
+// Сначала — все варианты один раз подряд без остановки (от самого первого к самому новому),
+// потом — случайный вариант раз в 5 минут без повторов.
 const FIRST_PASS = [15, 16, 17, 18, 19, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]; // индексы VARIANTS в порядке создания
-const PASS_GAP_MS = 20000;
+const PASS_GAP_MS = 0;      // пауза между вариантами в первом круге (0 = без остановки)
+const PASS_START_MS = 3000; // первый круг стартует через 3 сек после загрузки
 (async () => {
-  await sleep(JUST_UPDATED ? 1500 : PASS_GAP_MS);
+  await sleep(JUST_UPDATED ? 1500 : PASS_START_MS);
   for (let i = 0; i < FIRST_PASS.length; i++) {
     await playShow(FIRST_PASS[i]);
     if (i < FIRST_PASS.length - 1) await sleep(PASS_GAP_MS);
@@ -2785,7 +2801,7 @@ const PASS_GAP_MS = 20000;
   while (true) {
     const start = performance.now();
     await playShow();
-    await sleep(Math.max(0, EVERY_MS - (performance.now() - start))); // ровно раз в 2 минуты
+    await sleep(Math.max(0, EVERY_MS - (performance.now() - start))); // ровно раз в 5 минут
   }
 })();
 
