@@ -2329,11 +2329,51 @@ function runOlymp() {
   });
 }
 
+// --- 3. Срочные новости ---
+const nwSvg = svgPhase("nw");
+const NW_HEAD = ["СРОЧНО: Димон исчерпал лимиты Вселенной", "Учёные: GPT PRO у Димона умнее учёных", "DeepSeek подал в суд за моральный ущерб", "Курс: 1 Димон = 13 000 ₽ и растёт"];
+nwSvg.innerHTML = `
+  <defs><linearGradient id="nwBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1a3a"/><stop offset="1" stop-color="#1b3f8a"/></linearGradient></defs>
+  <rect width="1920" height="1080" fill="url(#nwBg)"/>
+  ${Array.from({ length: 12 }, (_, i) => `<rect x="${i * 170}" y="0" width="80" height="1080" fill="#fff" opacity=".03"/>`).join("")}
+  <g><rect x="1020" y="120" width="780" height="520" rx="16" fill="#000" stroke="#90caf9" stroke-width="8"/>
+    <rect x="1040" y="140" width="740" height="480" fill="#263238"/>
+    <g transform="translate(1410,600) scale(.7)">${tuxDima("nwDima")}</g>
+    <rect x="1040" y="560" width="740" height="60" fill="#c62828"/><text x="1410" y="605" text-anchor="middle" font-size="44" font-family="Impact" fill="#fff">ДИМОН. ФОТО ИЗ ЛИМУЗИНА</text></g>
+  <g transform="translate(560,860) scale(-.85,.85)">${succubus("nwK")}</g>
+  <rect x="200" y="700" width="760" height="200" rx="10" fill="#0d47a1" stroke="#000" stroke-width="6"/>
+  <text x="580" y="810" text-anchor="middle" font-size="58" font-family="Impact" fill="#fff">PRO-НОВОСТИ 24</text>
+  <text x="580" y="868" text-anchor="middle" font-size="34" font-weight="900" font-family="Segoe UI, Arial" fill="#90caf9">ведущая: Кунилка 😈</text>
+  <g transform="translate(70,70)"><circle id="nwLive" cx="20" cy="0" r="18" fill="#ff1744"/><text x="50" y="16" font-size="48" font-family="Impact" fill="#fff">LIVE</text></g>
+  <rect x="0" y="905" width="1920" height="70" fill="#c62828"/>
+  <text id="nwHead" x="40" y="958" font-size="50" font-family="Impact" fill="#fff"></text>
+  <rect x="0" y="975" width="1920" height="70" fill="#111"/>
+  <text id="nwTick" x="1920" y="1025" font-size="40" font-weight="900" font-family="Segoe UI, Arial" fill="#ffd54a">• Курс GPT PRO бьёт рекорды • Гуглилка ушла в отпуск искать себя • Бабушки у подъезда спорят о токенах • Погода: 100% PRO • Димон отказался от интервью: «занят, пишу код с PRO» •</text>
+  <g id="nwFlash"><rect width="1920" height="1080" fill="#c62828"/>
+    <text x="960" y="600" text-anchor="middle" font-size="300" font-family="Impact" fill="#fff" stroke="#000" stroke-width="8">СРОЧНО!</text></g>`;
+function runNews() {
+  show("nw");
+  return anim(12500, t => {
+    $("nwFlash").setAttribute("opacity", t < 1500 ? ((t / 180 | 0) % 2 ? 1 : .75) : 0);
+    $("nwFlash").setAttribute("display", t < 1500 ? "inline" : "none");
+    $("nwLive").setAttribute("opacity", (t / 450 | 0) % 2 ? 1 : .2);
+    const hi = Math.min(NW_HEAD.length - 1, Math.floor(Math.max(0, t - 1500) / 2700));
+    $("nwHead").textContent = NW_HEAD[hi];
+    $("nwHead").setAttribute("transform", `translate(${Math.max(0, 300 - ((t - 1500) % 2700)) * -3},0)`);
+    $("nwTick").setAttribute("x", 1920 - (t * .4 % 4200));
+    $("nwK").querySelector(".sArm").setAttribute("transform", `translate(60,-378) rotate(${-60 + Math.sin(t / 250) * 25})`);
+    $("nwK").querySelector(".sWhip").setAttribute("display", "none");
+    $("nwK").querySelector(".sTail").setAttribute("transform", `rotate(${Math.sin(t / 200) * 10},30,-230)`);
+    $("nwDima").querySelector(".aR").setAttribute("transform", `translate(66,-388) rotate(${-150 + Math.sin(t / 200) * 20})`);
+  });
+}
+
 /* ---------- шоу ---------- */
 let busy = false, showCount = 0;
 // все варианты по очереди, каждый запускается ровно раз в минуту
 const VARIANTS = [
-  runOlymp,                                                                                // олимпиада (новый — идёт первым)
+  runNews,                                                                                 // срочные новости (новый — идёт первым)
+  runOlymp,                                                                                // олимпиада
   runWeather,                                                                              // погода PRO
   runDS,                                                                                   // агенты DeepSeek и СОЛ 6.999
   runMMM,                                                                                  // пузырь Димвроди
