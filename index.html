@@ -2430,11 +2430,70 @@ function runRap() {
   });
 }
 
+// --- 5. Космос: GPT PRO летит на Луну ---
+const spSvg = svgPhase("sp");
+const stars = n => Array.from({ length: n }, (_, i) => `<circle cx="${(i * 137) % 1920}" cy="${(i * 89) % 1080}" r="${1 + i % 3}" fill="#fff" opacity="${.4 + (i % 5) / 8}"/>`).join("");
+spSvg.innerHTML = `
+  <g id="spLaunch">
+    <rect width="1920" height="1080" fill="#050a24"/>${stars(120)}
+    <rect x="0" y="960" width="1920" height="120" fill="#37474f"/>
+    <rect x="1060" y="420" width="40" height="540" fill="#78909c" stroke="#000" stroke-width="4"/>
+    <g id="spRocket" transform="translate(960,960)">
+      <g id="spFlame" opacity="0"><path d="M-55 0 Q0 260 55 0 Z" fill="#ff6d00"/><path d="M-30 0 Q0 160 30 0 Z" fill="#ffd54a"/></g>
+      <path d="M-70 -40 L-140 30 L-70 10 Z M70 -40 L140 30 L70 10 Z" fill="#e53935" stroke="#000" stroke-width="5"/>
+      <path d="M-70 0 L-70 -380 Q0 -560 70 -380 L70 0 Z" fill="#eceff1" stroke="#000" stroke-width="6"/>
+      <path d="M-70 -380 Q0 -560 70 -380 Z" fill="#e53935" stroke="#000" stroke-width="6"/>
+      <circle cx="0" cy="-300" r="44" fill="#9fd3ff" stroke="#000" stroke-width="6"/>
+      <circle cx="0" cy="-298" r="26" fill="#f1c39b"/><circle cx="-9" cy="-302" r="4"/><circle cx="9" cy="-302" r="4"/><path d="M-9 -288 Q0 -280 9 -288" stroke="#000" stroke-width="3" fill="none"/>
+      <text x="0" y="-150" text-anchor="middle" font-size="46" font-family="Impact" fill="#e53935" transform="rotate(-90,0,-150)" dy="16">GPT PRO</text>
+    </g>
+    <g id="spSmoke"></g>
+    <text id="spCount" x="400" y="560" text-anchor="middle" font-size="300" font-family="Impact" fill="#ffd54a" stroke="#000" stroke-width="8"></text>
+  </g>
+  <g id="spMoon" display="none">
+    <rect width="1920" height="1080" fill="#02030f"/>${stars(150)}
+    <circle cx="1550" cy="230" r="120" fill="#1e88e5"/><path d="M1480 180 Q1530 160 1560 200 Q1600 250 1560 290 Q1510 300 1490 260Z" fill="#43a047"/>
+    <path d="M0 800 Q400 740 900 790 Q1400 830 1920 770 L1920 1080 L0 1080 Z" fill="#9e9e9e"/>
+    <ellipse cx="400" cy="900" rx="90" ry="22" fill="#757575"/><ellipse cx="1400" cy="960" rx="140" ry="30" fill="#757575"/>
+    <g id="spAstro" transform="translate(760,880) scale(.85)">${person({ id: "spDima", jacket: "#eceff1", pants: "#cfd8dc", hair: "#3a2416", extra: `<circle cx="0" cy="-480" r="92" fill="#9fd3ff" opacity=".35" stroke="#fff" stroke-width="8"/><circle cx="-22" cy="-484" r="7"/><circle cx="22" cy="-484" r="7"/><path d="M-22 -448 Q0 -432 24 -452" stroke="#000" stroke-width="5" fill="none"/><text x="0" y="-300" text-anchor="middle" font-size="40" font-family="Impact" fill="#e53935">PRO</text>` })}</g>
+    <g id="spFlag" transform="translate(1000,880)"><line x1="0" y1="0" x2="0" y2="-420" stroke="#ccc" stroke-width="12"/>
+      <rect x="0" y="-420" width="260" height="160" fill="#fff" stroke="#000" stroke-width="5"/><text x="130" y="-320" text-anchor="middle" font-size="70" font-family="Impact" fill="url(#gold)" stroke="#7a5600" stroke-width="2">PRO</text></g>
+    <g id="spQuote" opacity="0"><rect x="160" y="80" width="1240" height="160" rx="30" fill="#fff" stroke="#000" stroke-width="5"/>
+      <text text-anchor="middle" font-size="44" font-weight="900" font-family="Segoe UI, Arial" fill="#111"><tspan x="780" y="148">«Один маленький промпт для Димона —</tspan><tspan x="780" y="205">огромный PRO для человечества»</tspan></text></g>
+  </g>`;
+const spPuffs = [...Array(24)].map(() => { const c = document.createElementNS(SVGNS, "circle"); c.setAttribute("fill", "#cfd8dc"); $("spSmoke").appendChild(c); return { c, a: Math.random() * Math.PI, d: Math.random() }; });
+async function runSpace() {
+  show("sp"); $("spLaunch").setAttribute("display", "inline"); $("spMoon").setAttribute("display", "none");
+  await anim(7500, t => {
+    const c = t < 3000 ? 3 - Math.floor(t / 1000) : null;
+    $("spCount").textContent = c ? c : t < 4300 ? "ПУСК!" : "";
+    const lift = clamp01((t - 3300) / 4000), y = 960 - lift * lift * 1700;
+    const shake = t > 3000 ? Math.sin(t / 25) * 5 : 0;
+    $("spRocket").setAttribute("transform", `translate(${960 + shake},${y})`);
+    $("spFlame").setAttribute("opacity", t > 3000 ? 1 : 0);
+    $("spFlame").setAttribute("transform", `scale(1,${1 + Math.sin(t / 40) * .2})`);
+    spPuffs.forEach((p, i) => {
+      const k = ((t / 1400) + p.d) % 1, on = t > 3000;
+      p.c.setAttribute("cx", 960 + Math.cos(p.a) * k * 600 * (i % 2 ? 1 : -1)); p.c.setAttribute("cy", 960 - k * 120);
+      p.c.setAttribute("r", 30 + k * 90); p.c.setAttribute("opacity", on ? (1 - k) * .9 : 0);
+    });
+  });
+  $("spLaunch").setAttribute("display", "none"); $("spMoon").setAttribute("display", "inline");
+  await anim(6500, t => {
+    const k = clamp01(t / 1200);
+    $("spFlag").setAttribute("transform", `translate(1000,${880 + (1 - k) * -400})`);
+    $("spAstro").setAttribute("transform", `translate(760,${880 - Math.abs(Math.sin(t / 400)) * 40}) scale(.85)`);
+    $("spDima").querySelector(".aR").setAttribute("transform", `translate(66,-388) rotate(${-120 + Math.sin(t / 200) * 15})`);
+    $("spQuote").setAttribute("opacity", t > 1400 ? 1 : 0);
+  });
+}
+
 /* ---------- шоу ---------- */
 let busy = false, showCount = 0;
 // все варианты по очереди, каждый запускается ровно раз в минуту
 const VARIANTS = [
-  runRap,                                                                                  // рэп-баттл (новый — идёт первым)
+  runSpace,                                                                                // космос (новый — идёт первым)
+  runRap,                                                                                  // рэп-баттл
   runNews,                                                                                 // срочные новости
   runOlymp,                                                                                // олимпиада
   runWeather,                                                                              // погода PRO
