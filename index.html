@@ -2488,11 +2488,73 @@ async function runSpace() {
   });
 }
 
+// --- 6. Золотая рыбка GPT PRO ---
+const fsSvg = svgPhase("fs");
+fsSvg.innerHTML = `
+  <defs><linearGradient id="fsSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9a76"/><stop offset="1" stop-color="#ffe0b2"/></linearGradient>
+    <linearGradient id="fsWater" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fc3f7"/><stop offset="1" stop-color="#0d47a1"/></linearGradient></defs>
+  <rect width="1920" height="1080" fill="url(#fsSky)"/><circle cx="1500" cy="560" r="130" fill="#ffd54a" opacity=".85"/>
+  <rect x="0" y="600" width="1920" height="480" fill="url(#fsWater)"/>
+  <path id="fsWave" d="M0 610 Q60 590 120 610 T240 610 T360 610 T480 610 T600 610 T720 610 T840 610 T960 610 T1080 610 T1200 610 T1320 610 T1440 610 T1560 610 T1680 610 T1800 610 T1920 610 T2040 610" stroke="#e1f5fe" stroke-width="6" fill="none"/>
+  <rect x="0" y="560" width="620" height="40" fill="#8d6e63" stroke="#000" stroke-width="5"/><rect x="80" y="600" width="26" height="240" fill="#6d4c41"/><rect x="480" y="600" width="26" height="240" fill="#6d4c41"/>
+  <g transform="translate(380,560) scale(.75)">${person({ id: "fsDima", jacket: "#558b2f", pants: "#33691e", hair: "#3a2416", extra: `<path d="M-74 -520 Q0 -600 74 -520 L90 -510 L-90 -510 Z" fill="#827717" stroke="#000" stroke-width="4"/><circle id="fsEyeL" cx="-22" cy="-484" r="7"/><circle id="fsEyeR" cx="22" cy="-484" r="7"/><path id="fsMouth" d="M-22 -448 Q0 -436 24 -452" stroke="#000" stroke-width="5" fill="none"/>` })}</g>
+  <path id="fsRod" stroke="#4e342e" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path id="fsLine" stroke="#fff" stroke-width="3" fill="none"/>
+  <g id="fsFloat"><circle r="16" fill="#e53935" stroke="#000" stroke-width="3"/><path d="M-16 0 H16" stroke="#fff" stroke-width="5"/></g>
+  <g id="fsFish" opacity="0">
+    <path d="M-90 0 L-150 -50 L-140 50 Z" fill="url(#gold)" stroke="#7a5600" stroke-width="5"/>
+    <ellipse rx="110" ry="62" fill="url(#gold)" stroke="#7a5600" stroke-width="6"/>
+    <path d="M-30 -60 Q0 -110 40 -58" fill="#ffca28" stroke="#7a5600" stroke-width="4"/>
+    <circle cx="55" cy="-12" r="14" fill="#fff" stroke="#000" stroke-width="3"/><circle cx="59" cy="-12" r="6"/>
+    <path d="M80 18 Q95 26 105 14" stroke="#000" stroke-width="4" fill="none"/>
+    <path d="M20 -66 L30 -110 L50 -80 L70 -116 L80 -70 Z" fill="#ffd54a" stroke="#7a5600" stroke-width="4"/>
+    <text x="-20" y="22" text-anchor="middle" font-size="34" font-family="Impact" fill="#7a3f00">GPT PRO</text>
+  </g>
+  <text id="fsBite" x="560" y="460" font-size="80" font-family="Impact" fill="#e53935" stroke="#000" stroke-width="3" opacity="0">КЛЮЁТ!</text>
+  <g id="fsBub" opacity="0"><rect x="880" y="60" width="980" height="130" rx="65" fill="#fff" stroke="#000" stroke-width="5"/>
+    <text id="fsTxt" x="1370" y="142" text-anchor="middle" font-size="44" font-weight="900" font-family="Segoe UI, Arial" fill="#111"></text></g>
+  <g id="fsWishes" font-size="50" font-family="Impact" fill="#fff" stroke="#000" stroke-width="2">
+    <text x="980" y="290" opacity="0">1. БЕЗЛИМИТ ✔</text><text x="980" y="370" opacity="0">2. ПЕЛЬМЕНИ НАВСЕГДА ✔</text><text x="980" y="450" opacity="0">3. ЧТОБЫ DEEPSEEK ЗАВИДОВАЛ ✔</text></g>
+  <g id="fsSplash"></g>`;
+const fsDrops = [...Array(18)].map(() => { const c = document.createElementNS(SVGNS, "circle"); c.setAttribute("r", 10); c.setAttribute("fill", "#e1f5fe"); $("fsSplash").appendChild(c); return { c, vx: (Math.random() - .5) * 600, vy: -400 - Math.random() * 400 }; });
+function runFish() {
+  show("fs");
+  const SAY = [[3200, "Отпусти меня, Димон — исполню 3 желания!"], [7600, "Готово. С тебя подписка PRO 😏"], [10600, null]];
+  const tip = [760, 300];
+  return anim(12500, t => {
+    $("fsWave").setAttribute("transform", `translate(${-(t / 10 % 240)},${Math.sin(t / 300) * 4})`);
+    const pull = t > 2200 && t < 3000 ? clamp01((t - 2200) / 800) : t >= 3000 ? 1 : 0;
+    const rodTip = [lerp(760, 640, pull), lerp(300, 220, pull)];
+    $("fsRod").setAttribute("d", `M440 360 Q${rodTip[0] - 150} ${rodTip[1] - 30} ${rodTip[0]} ${rodTip[1]}`);
+    // поплавок / рыбка
+    const bite = t > 1300 && t < 2200;
+    const fx = 1000, fy = 612 + (bite ? Math.sin(t / 50) * 18 : Math.sin(t / 400) * 4);
+    $("fsFloat").setAttribute("transform", `translate(${fx},${fy})`); $("fsFloat").setAttribute("opacity", t < 2400 ? 1 : 0);
+    $("fsBite").setAttribute("opacity", bite ? 1 : 0);
+    const out = clamp01((t - 2200) / 900), released = clamp01((t - 10600) / 900);
+    const fishX = released ? lerp(820, 1300, released) : lerp(fx, 820, out), fishY = released ? 380 - Math.sin(released * Math.PI) * 250 + released * 300 : lerp(640, 380, out) - Math.sin(out * Math.PI) * 120;
+    $("fsFish").setAttribute("opacity", t > 2200 && released < 1 ? 1 : 0);
+    $("fsFish").setAttribute("transform", `translate(${fishX},${fishY + (t > 3000 && !released ? Math.sin(t / 120) * 8 : 0)}) rotate(${released ? 40 + released * 60 : Math.sin(t / 90) * 8})`);
+    $("fsLine").setAttribute("d", t < 2400 ? `M${rodTip[0]} ${rodTip[1]} Q${(rodTip[0] + fx) / 2} ${fy - 60} ${fx} ${fy}` : released ? "" : `M${rodTip[0]} ${rodTip[1]} L${fishX + 100} ${fishY - 20}`);
+    let s = null; SAY.forEach(([a, x]) => { if (t >= a) s = x; });
+    $("fsBub").setAttribute("opacity", s ? 1 : 0);
+    if (s && $("fsTxt").textContent !== s) { $("fsTxt").textContent = s; $("fsTxt").removeAttribute("textLength"); if ($("fsTxt").getComputedTextLength() > 920) { $("fsTxt").setAttribute("textLength", 920); $("fsTxt").setAttribute("lengthAdjust", "spacingAndGlyphs"); } }
+    [...$("fsWishes").children].forEach((w, i) => w.setAttribute("opacity", t > 4700 + i * 900 && t < 10600 ? 1 : 0));
+    const happy = t > 4700;
+    $("fsMouth").setAttribute("d", happy ? "M-26 -452 Q0 -420 26 -452" : "M-22 -448 Q0 -436 24 -452");
+    $("fsDima").querySelector(".aL").setAttribute("transform", `translate(-66,-388) rotate(${happy && t < 10600 ? 150 + Math.sin(t / 120) * 15 : -60})`);
+    $("fsDima").querySelector(".aR").setAttribute("transform", `translate(66,-388) rotate(-70)`);
+    const sk = clamp01((t - 11500) / 900);
+    fsDrops.forEach(d => { d.c.setAttribute("cx", 1300 + d.vx * sk); d.c.setAttribute("cy", 640 + d.vy * sk + 900 * sk * sk); d.c.setAttribute("opacity", sk > 0 && sk < 1 ? 1 : 0); });
+  });
+}
+
 /* ---------- шоу ---------- */
 let busy = false, showCount = 0;
 // все варианты по очереди, каждый запускается ровно раз в минуту
 const VARIANTS = [
-  runSpace,                                                                                // космос (новый — идёт первым)
+  runFish,                                                                                 // золотая рыбка (новый — идёт первым)
+  runSpace,                                                                                // космос
   runRap,                                                                                  // рэп-баттл
   runNews,                                                                                 // срочные новости
   runOlymp,                                                                                // олимпиада
