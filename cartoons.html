@@ -2791,6 +2791,18 @@ const JUST_UPDATED = new URLSearchParams(location.search).has("v");
 const FIRST_PASS = [15, 16, 17, 18, 19, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]; // индексы VARIANTS в порядке создания
 const PASS_GAP_MS = 0;      // пауза между вариантами в первом круге (0 = без остановки)
 const PASS_START_MS = 3000; // первый круг стартует через 3 сек после загрузки
+// Режим билборда (?billboard): все мультики по кругу друг за другом, пауза 10 сек, бесконечно.
+const BILLBOARD = new URLSearchParams(location.search).has("billboard");
+const BILLBOARD_GAP_MS = 10000;
+if (BILLBOARD) {
+  (async () => {
+    await sleep(1000);
+    for (let i = 0; ; i = (i + 1) % FIRST_PASS.length) {
+      await playShow(FIRST_PASS[i]);
+      await sleep(BILLBOARD_GAP_MS);
+    }
+  })();
+} else
 (async () => {
   await sleep(JUST_UPDATED ? 1500 : PASS_START_MS);
   for (let i = 0; i < FIRST_PASS.length; i++) {
@@ -2823,8 +2835,7 @@ async function checkUpdate() {
     }
   } catch (e) { /* нет интернета — просто пробуем позже */ }
 }
-checkUpdate();
-setInterval(checkUpdate, 10000);
+if (!BILLBOARD) { checkUpdate(); setInterval(checkUpdate, 10000); } // в билборде обновляется вся страница целиком
 </script>
 </body>
 </html>
