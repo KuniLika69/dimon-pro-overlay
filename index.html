@@ -70,6 +70,25 @@
                 font: 800 clamp(12px, 1.1vw, 20px) "Segoe UI", Arial, sans-serif; color: #111; text-align: center; opacity: 0; transition: opacity .2s; }
   .chibi .say.on { opacity: 1; }
 
+  /* звонок эйчара */
+  #call { position: fixed; right: 1.5vw; top: 3vh; width: clamp(240px, 26vw, 500px); background: rgba(12, 14, 24, .95); border: 4px solid #4caf50; border-radius: 22px;
+          box-shadow: 0 0 30px rgba(76,175,80,.45); font-family: "Segoe UI", Arial, sans-serif; color: #fff; overflow: hidden; display: none; }
+  #call.on { display: block; animation: pop .45s cubic-bezier(.2,1.6,.4,1) both; }
+  #call.ring { animation: ringShake .12s infinite; border-color: #ffd54a; }
+  @keyframes ringShake { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg) translateX(3px); } }
+  .cHead { display: flex; align-items: center; gap: 1vw; padding: 1.4vh 1.2vw; background: linear-gradient(90deg, #1b5e20, #2e7d32); }
+  .cAva { width: clamp(46px, 4.5vw, 84px); flex: 0 0 auto; }
+  .cName { font: 900 clamp(15px, 1.5vw, 28px) "Segoe UI", Arial; }
+  .cCo { font: 700 clamp(11px, 1vw, 19px) "Segoe UI", Arial; color: #c8e6c9; }
+  .cTime { margin-left: auto; font: 900 clamp(13px, 1.2vw, 22px) Consolas, monospace; color: #b9f6ca; }
+  .cRing { padding: 2vh 1.2vw; text-align: center; font: 900 clamp(16px, 1.7vw, 32px) Impact, sans-serif; color: #ffd54a; letter-spacing: .03em; }
+  #cLog { padding: 1.2vh 1vw; display: flex; flex-direction: column; gap: .9vh; min-height: 10vh; }
+  .cm { max-width: 86%; padding: .9vh .9vw; border-radius: 14px; font: 700 clamp(12px, 1.15vw, 21px)/1.25 "Segoe UI", Arial; animation: rise .25s ease-out; }
+  .cm.hr { align-self: flex-start; background: #37474f; border: 2px solid #90a4ae; }
+  .cm.dm { align-self: flex-end; background: #2f6fed; }
+  .cm b { display: block; font-size: .8em; opacity: .75; }
+  @keyframes rise { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+
   /* статус (виден только в тест-режиме) */
   #status { position: fixed; top: 8px; left: 8px; font: 600 14px "Segoe UI", Arial; color: #fff; background: rgba(0,0,0,.6); padding: 4px 10px; border-radius: 8px; display: none; }
 </style>
@@ -79,6 +98,7 @@
 <div id="status"></div>
 <div id="crt"><div class="crtCase"><div class="crtScreen"><div id="crtText"></div></div><div class="crtLed"></div></div></div>
 <div id="agents"></div>
+<div id="call"></div>
 <div id="prompt"></div>
 <div id="box">
   <svg viewBox="0 0 400 400">
@@ -130,6 +150,8 @@
       <rect x="166" y="132" width="30" height="20" rx="6" fill="none" stroke="#000" stroke-width="3"/><rect x="204" y="132" width="30" height="20" rx="6" fill="none" stroke="#000" stroke-width="3"/>
       <path d="M196 140 H204" stroke="#000" stroke-width="3"/>
       <ellipse id="bxMouth" cx="200" cy="168" rx="8" ry="3" fill="#5a0d0d" stroke="#000" stroke-width="2"/>
+      <g id="bxPhone" display="none"><rect x="234" y="120" width="16" height="30" rx="4" fill="#222" stroke="#000" stroke-width="2"/><rect x="237" y="124" width="10" height="20" fill="#4caf50"/>
+        <path d="M250 196 Q262 170 246 150" stroke="#3d7be0" stroke-width="14" stroke-linecap="round" fill="none"/></g>
       <path id="bxArm" stroke="#3d7be0" stroke-width="16" stroke-linecap="round" fill="none"/>
       <g id="bxFork"><line x1="0" y1="0" x2="0" y2="-26" stroke="#ccc" stroke-width="3"/><path d="M-7 -32 Q0 -42 7 -32 Z" fill="#fff8e7" stroke="#b08b5a" stroke-width="2"/><circle r="7" fill="#f1c39b" stroke="#000" stroke-width="2"/></g>
     </g>
@@ -303,16 +325,17 @@ if (TEST && CHAT_ON) {
    Сначала встроенный русский голос (speechSynthesis), если его нет — озвучка Google.
    В OBS у источника включите «Управлять звуком через OBS», чтобы звук шёл в стрим. */
 const VOICE_ON = true;
-let ruVoice = null;
+let ruVoice = null, ruVoiceF = null;
 function pickVoice() {
   try {
     const vs = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
     const ru = vs.filter(v => /^ru/i.test(v.lang));
     ruVoice = ru.find(v => /dmitr|pavel|male|мужск|maxim|yuri/i.test(v.name)) || ru[0] || null;
+    ruVoiceF = ru.find(v => /irina|svetlana|ekaterina|milena|female|женск|alena/i.test(v.name)) || ru.find(v => v !== ruVoice) || ruVoice;
   } catch (e) { ruVoice = null; }
 }
 try { pickVoice(); if (window.speechSynthesis) speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {}
-function sayAloud(text) {
+function sayAloud(text, who) {
   if (!VOICE_ON) return;
   const clean = String(text).replace(/[^\p{L}\p{N}\s,.!?:-]/gu, " ").replace(/\s+/g, " ").trim();
   if (!clean) return;
@@ -320,7 +343,8 @@ function sayAloud(text) {
     if (ruVoice) {
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(clean);
-      u.voice = ruVoice; u.lang = "ru-RU"; u.rate = 1.05; u.pitch = 0.9; u.volume = 1;
+      const hr = who === "hr", hrm = who === "hrm";
+      u.voice = hr ? ruVoiceF : ruVoice; u.lang = "ru-RU"; u.rate = hr || hrm ? 1.12 : 1.05; u.pitch = hr ? 1.2 : hrm ? 1.25 : 0.9; u.volume = 1;
       speechSynthesis.speak(u);
       return;
     }
@@ -332,7 +356,7 @@ function sayAloud(text) {
 }
 
 /* ---------- Дима в квадрате: ест пельмени, пишет промты, раз в минуту танцует ---------- */
-const PROMPT_EVERY_MS = 20000;  // промт раз в 20 сек
+const PROMPT_EVERY_MS = 60000;  // говорит промт примерно раз в минуту
 const DANCE_EVERY_MS  = 180000; // раз в 3 минуты встаёт танцевать
 const DANCE_MS        = 18000;  // сколько танцует
 const PROMPTS = ["сделай круче", "ещё круче", "ну чё, готов?", "а теперь в 10 раз круче", "добавь больше PRO", "перепиши, но чтобы я не понял",
@@ -443,6 +467,7 @@ function nextPrompt() {
   let danceBag = [];
   const nextDance = () => { if (!danceBag.length) danceBag = [...DANCE_LINES].sort(() => Math.random() - .5); return danceBag.shift(); };
   async function speak() {
+    if (window.dimaOnCall) return; // во время звонка эйчара промты не пишет
     const c = (performance.now() - t0) % DANCE_EVERY_MS, dancing = c >= DANCE_EVERY_MS - DANCE_MS - 2000;
     const box = $("box").getBoundingClientRect(), p = $("prompt");
     const line = dancing ? nextDance() : nextPrompt();
@@ -562,6 +587,83 @@ function runChibi([name, col], idx) {
 }
 async function agentsWave() { const n = 2 + (Math.random() * 3 | 0); await Promise.all(pickAgents(n).map((a, i) => runChibi(a, i))); }
 setTimeout(() => { agentsWave(); setInterval(agentsWave, AGENTS_EVERY_MS); }, AGENTS_FIRST_MS);
+
+/* ---------- звонки эйчаров: раз в 10 минут, собес ~2 минуты, Дима отказывается ---------- */
+const CALL_EVERY_MS = 600000, CALL_FIRST_MS = 90000, CALL_LINE_MS = 6800;
+const HR_NAMES = ["Анжелика", "Виктория", "Олег Петрович", "Кристина", "Эдуард", "Снежана", "Марина Сергеевна", "Артём", "Жанна", "Аркадий", "Элеонора", "Станислав"];
+const HR_MALE = ["Олег Петрович", "Эдуард", "Артём", "Аркадий", "Станислав"];
+const HR_COS = ["ЯПельмень", "СберТокен", "НейроГаз", "ГуглоКорп", "ТокенБанк", "Илон-Маск-Корп (почти)", "КиберПроГрад Девелопмент", "Пельмень-Тех", "ЛимитНет",
+  "DeepНеSeek", "МегаМозг Холдинг", "ВайбКодинг Групп", "Скибиди-Софт", "Рога и Токены"];
+const SAL = ["1 миллион в месяц", "3 миллиона", "500 тысяч долларов", "10 миллионов", "миллиард токенов", "2 миллиона и квартиру", "7 миллионов и бесконечные лимиты",
+  "20 миллионов", "зарплату в биткоинах", "половину компании", "100 миллионов и остров", "весь бюджет на год"];
+const L = {
+  greet: ["Дмитрий, добрый день! Я {name} из «{co}». Есть минутка?", "Алло, Дима? Это {name}, компания «{co}». Мы о вас наслышаны!", "Дмитрий, здравствуйте! {name}, «{co}». Вы же тот самый Димон PRO?",
+    "Дима, привет! {name} из «{co}». Не кладите трубку, умоляю!", "Добрый вечер! Компания «{co}», меня зовут {name}. Вас рекомендовал сам GPT!"],
+  dGreet: ["Ну, смотря что предложите", "Говорите быстрее, у меня пельмени стынут", "Я на стриме, у вас две минуты", "Опять вы? Ладно, слушаю", "Чат, тише, тут HR звонит",
+    "Только если коротко. Я занят — я PRO", "Да-да, я тот самый. Чего хотели?"],
+  offer: ["Предлагаем вам {sal}!", "Готовы платить {sal}. Плюс офис с ёлкой!", "Для вас — {sal} и кресло из золота!", "Стартовая зарплата — {sal}. Это только начало!",
+    "Мы предлагаем {sal}, и вы можете не приходить на работу!"],
+  dQ: ["А лимиты у вас безлимитные?", "А пельмени в офисе есть?", "А танцевать скибиди на работе можно?", "А DeepSeek у вас случайно не стоит?", "А удалёнка из Вегаса подойдёт?",
+    "А GPT PRO оплатите?", "А дресс-код — шортики?", "А ёлка в офисе круглый год?", "А начальник умнее меня? Если да — не пойду", "А обед можно с Кунилкой?"],
+  hrA: ["Конечно! Всё что угодно!", "Да! Мы даже наймём для вас Кунилку!", "Пельмени — круглосуточно, ручной лепки!", "Купим вам GPT PRO на сто лет вперёд!",
+    "Скибиди — обязательная часть рабочего дня!", "DeepSeek мы удалили, как только услышали ваше имя!", "Офис перенесём в Вегас, хоть завтра!", "Начальником будете вы. Мы все — под вами!"],
+  raise: ["Хорошо! {sal}! И акции компании!", "Ладно, ладно — {sal} и личный повар!", "Поднимаем: {sal}! Только скажите «да»!", "Генеральный разрешил: {sal}!"],
+  dCond: ["Мало. У меня GPT PRO, я сам себе компания", "Мне надо подумать... секунду... нет", "А можно я буду работать один час в год?", "Только если офис будет в 2077 году",
+    "Хм. А вы тоже на free-тарифе сидите?", "Это несерьёзно. Мой промт стоит дороже", "Звучит как пирамида Димвроди, но поменьше"],
+  beg: ["Дмитрий, умоляю! Генеральный плачет!", "Пожалуйста! Без вас у нас нейросеть не запускается!", "Мы назовём офис в вашу честь!", "Я лично буду носить вам пельмени!",
+    "Дима, весь отдел стоит на коленях, я вижу!", "У нас инвесторы уходят, говорят: «без Димона не будет»!", "Я встану в очередь за вами, как те бомжи за лимитами!"],
+  dRefuse: ["Нет, спасибо. Я уже PRO", "Извините, у меня скибиди по расписанию", "Не, у меня стрим. Чат важнее", "Я подумаю... лет через десять", "Нет. Мне и тут пельменей хватает",
+    "Отказываюсь. Вежливо, но с огнём в глазах"],
+  desperate: ["Дмитрий, последний шанс: {sal} и вертолёт!", "Ладно — вся компания ваша! Просто приходите!", "Мы купим вам Хаммер, Газель и пирамиду!", "Хорошо: {sal} и вы можете вообще молчать!"],
+  dFinal: ["Нет. Всё, пельмени зовут. Пока!", "Отказываюсь. Перезвоните, когда наступит 2077", "Не-а. Я свободный PRO-художник", "Нет, спасибо. Мне GPT уже всё сделал. Пока!",
+    "Мой ответ — нет. Чат, вы слышали? НЕТ!"],
+  bye: ["Хорошо... мы перезвоним через 10 минут 😭", "Я не сдамся! До связи!", "Генеральный будет рыдать... До свидания...", "Понятно... пойду тоже куплю GPT PRO 😢"],
+};
+const bags = {};
+const pickL = k => { if (!bags[k] || !bags[k].length) bags[k] = [...L[k]].sort(() => Math.random() - .5); return bags[k].shift(); };
+let salBag = [];
+const pickSal = () => { if (!salBag.length) salBag = [...SAL].sort(() => Math.random() - .5); return salBag.shift(); };
+const hrAva = (hair, skin) => `<svg viewBox="0 0 100 100" width="100%"><circle cx="50" cy="50" r="48" fill="#e3f2fd"/><path d="M14 60 Q12 12 50 12 Q88 12 86 60 L80 90 L20 90Z" fill="${hair}"/>
+  <circle cx="50" cy="52" r="26" fill="${skin}" stroke="#000" stroke-width="2"/><circle cx="41" cy="50" r="3"/><circle cx="59" cy="50" r="3"/>
+  <path d="M40 62 Q50 70 60 62" stroke="#c2185b" stroke-width="3" fill="none"/><path d="M30 96 Q50 76 70 96" fill="#263238"/>
+  <rect x="18" y="44" width="8" height="14" rx="3" fill="#333"/><path d="M22 58 Q26 72 40 70" stroke="#333" stroke-width="2" fill="none"/></svg>`;
+function buildScript() {
+  const name = HR_NAMES[Math.random() * HR_NAMES.length | 0], co = HR_COS[Math.random() * HR_COS.length | 0];
+  const f = s => s.replace("{name}", name).replace("{co}", co).replace("{sal}", pickSal());
+  const order = ["greet", "dGreet", "offer", "dQ", "hrA", "dQ", "hrA", "raise", "dCond", "beg", "dRefuse", "raise", "dQ", "hrA", "beg", "dCond", "desperate", "dFinal", "bye"];
+  return { name, co, lines: order.map(k => ({ who: k[0] === "d" && k !== "desperate" ? "dm" : "hr", text: f(pickL(k)) })) };
+}
+async function hrCall() {
+  const c = $("call"), sc = buildScript();
+  const hair = ["#3a2416", "#f5d06b", "#c0392b", "#111", "#8e5a2b", "#6a4c93"][Math.random() * 6 | 0];
+  c.innerHTML = `<div class="cHead"><div class="cAva">${hrAva(hair, "#f6cfae")}</div><div><div class="cName">${esc(sc.name)} · HR</div><div class="cCo">«${esc(sc.co)}»</div></div><div class="cTime" id="cTime">📞</div></div>
+    <div class="cRing" id="cRing">📞 ВХОДЯЩИЙ ЗВОНОК... ДИМА, ВОЗЬМИ!</div><div id="cLog"></div>`;
+  c.className = "on ring";
+  window.dimaOnCall = true;
+  $("bxPhone").setAttribute("display", "inline");
+  sayAloud("дзынь-дзынь, входящий звонок", "hr");
+  await sleep(4000);
+  c.className = "on";
+  $("cRing").remove();
+  const t0 = performance.now();
+  const timer = setInterval(() => { const s = (performance.now() - t0) / 1000 | 0; $("cTime").textContent = `${String(s / 60 | 0).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; }, 500);
+  for (const ln of sc.lines) {
+    const m = document.createElement("div");
+    m.className = "cm " + ln.who;
+    m.innerHTML = `<b>${ln.who === "hr" ? esc(sc.name) : "Димон"}</b>${esc(ln.text)}`;
+    $("cLog").appendChild(m);
+    while ($("cLog").children.length > 3) $("cLog").firstChild.remove();
+    sayAloud(ln.text, ln.who === "hr" ? (HR_MALE.includes(sc.name) ? "hrm" : "hr") : "dm");
+    await sleep(CALL_LINE_MS);
+  }
+  clearInterval(timer);
+  $("cTime").textContent = "звонок завершён";
+  await sleep(2500);
+  c.className = "";
+  window.dimaOnCall = false;
+  $("bxPhone").setAttribute("display", "none");
+}
+setTimeout(() => { hrCall(); setInterval(hrCall, CALL_EVERY_MS); }, CALL_FIRST_MS);
 
 /* ---------- автообновление: новая версия подхватывается сама, ссылка в OBS та же ---------- */
 let myVersion = null;
