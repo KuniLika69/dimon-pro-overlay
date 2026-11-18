@@ -2549,11 +2549,65 @@ function runFish() {
   });
 }
 
+// --- 7. Экзамен ---
+const exSvg = svgPhase("ex");
+const deskKid = (x, i) => `<g transform="translate(${x},860)">
+  <circle cx="0" cy="-150" r="56" fill="#f6cfae" stroke="#000" stroke-width="4"/>
+  <path d="M-56 -160 Q-50 -220 0 -218 Q50 -220 56 -160 Q40 -190 0 -186 Q-40 -190 -56 -160Z" fill="${["#5a3a1a", "#111", "#d4a017", "#c0392b"][i]}"/>
+  <circle cx="-20" cy="-152" r="10" fill="#fff" stroke="#000" stroke-width="2"/><circle cx="20" cy="-152" r="10" fill="#fff" stroke="#000" stroke-width="2"/>
+  <circle cx="-20" cy="-148" r="4"/><circle cx="20" cy="-148" r="4"/>
+  <path d="M-14 -118 Q0 -126 14 -118" stroke="#000" stroke-width="4" fill="none"/>
+  <path class="exSweat" d="M48 -190 q10 18 0 26 q-10 -8 0 -26z" fill="#29b6f6" stroke="#000" stroke-width="2"/>
+  <path d="M-90 -100 L90 -100 L90 -50 L-90 -50 Z" fill="#6d4c41" stroke="#000" stroke-width="4"/><rect x="-80" y="-50" width="14" height="110" fill="#5d4037"/><rect x="66" y="-50" width="14" height="110" fill="#5d4037"/>
+  <rect x="-40" y="-112" width="80" height="14" fill="#fff" stroke="#000" stroke-width="2"/></g>`;
+exSvg.innerHTML = `
+  <rect width="1920" height="1080" fill="#f3e5ab"/><rect x="0" y="880" width="1920" height="200" fill="#a1887f"/>
+  <rect x="260" y="60" width="1400" height="420" rx="10" fill="#1b4d2e" stroke="#6d4c41" stroke-width="18"/>
+  <text x="960" y="180" text-anchor="middle" font-size="70" font-family="Comic Sans MS, Segoe UI" fill="#fff">∫ лимиты · d(токен) = ?</text>
+  <text x="960" y="270" text-anchor="middle" font-size="44" font-family="Comic Sans MS, Segoe UI" fill="#ddd">(задача со звёздочкой ★★★)</text>
+  <text id="exAns" x="960" y="400" text-anchor="middle" font-size="80" font-family="Comic Sans MS, Segoe UI" fill="#ffd54a" opacity="0">= ∞ (у Димона PRO)</text>
+  <g transform="translate(1780,880) scale(.8)">${person({ id: "exT", jacket: "#5d4037", pants: "#3e2723", hair: "#bdbdbd", extra: `<circle cx="-22" cy="-484" r="20" fill="none" stroke="#000" stroke-width="5"/><circle cx="22" cy="-484" r="20" fill="none" stroke="#000" stroke-width="5"/><path d="M-2 -484 H2" stroke="#000" stroke-width="5"/><circle cx="-22" cy="-484" r="5"/><circle cx="22" cy="-484" r="5"/><path id="exTMouth" d="M-20 -440 H20" stroke="#000" stroke-width="6"/>` })}</g>
+  ${[200, 480, 1260, 1540].map((x, i) => deskKid(x, i)).join("")}
+  <g transform="translate(870,880) scale(.62)">${person({ id: "exD", jacket: "#3d7be0", pants: "#2d3a4f", hair: "#3a2416", extra: `<rect x="-54" y="-504" width="108" height="30" rx="12" fill="#000"/><path d="M-22 -448 Q0 -432 24 -452" stroke="#000" stroke-width="5" fill="none"/>` })}</g>
+  <g transform="translate(960,860)"><path d="M-110 -100 L110 -100 L110 -50 L-110 -50 Z" fill="#6d4c41" stroke="#000" stroke-width="4"/>
+    <rect x="-70" y="-200" width="140" height="96" rx="6" fill="#222" stroke="#000" stroke-width="4"/><rect id="exScr" x="-60" y="-190" width="120" height="76" fill="#0b2"/>
+    <text x="0" y="-142" text-anchor="middle" font-size="24" font-family="Impact" fill="#000">GPT PRO</text></g>
+  <g id="exBubs"></g>
+  <g id="exStamp" opacity="0" transform="translate(960,560)"><circle r="190" fill="#fff" fill-opacity=".85" stroke="#d50000" stroke-width="18"/>
+    <text y="60" text-anchor="middle" font-size="200" font-family="Impact" fill="#d50000">5+</text>
+    <text y="140" text-anchor="middle" font-size="50" font-family="Impact" fill="#d50000">ОТЛИЧНО PRO</text></g>`;
+const exB = [...Array(5)].map(() => { const g = document.createElementNS(SVGNS, "g"); g.innerHTML = `<rect x="-170" y="-40" width="340" height="64" rx="32" fill="#fff" stroke="#000" stroke-width="4"/><text x="0" y="4" text-anchor="middle" font-size="30" font-weight="900" font-family="Segoe UI, Arial" fill="#111"></text>`; g.setAttribute("opacity", 0); $("exBubs").appendChild(g); return g; });
+function exSay(i, x, y, txt) {
+  const g = exB[i]; if (!txt) return g.setAttribute("opacity", 0);
+  const tx = g.querySelector("text");
+  if (tx.textContent !== txt) { tx.textContent = txt; tx.removeAttribute("textLength"); if (tx.getComputedTextLength() > 310) { tx.setAttribute("textLength", 310); tx.setAttribute("lengthAdjust", "spacingAndGlyphs"); } }
+  g.setAttribute("transform", `translate(${x},${y})`); g.setAttribute("opacity", 1);
+}
+function runExam() {
+  show("ex");
+  return anim(12000, t => {
+    exSay(4, 1520, 500, t > 300 && t < 3000 ? "Кто решит — получит 5!" : t > 7400 && t < 12000 ? "Э-это... гениально 😳" : null);
+    const kids = [[200, "мама..."], [480, "можно выйти?"], [1260, "я болею"], [1540, "...а?"]];
+    kids.forEach(([x, txt], i) => exSay(i, x, 620, t > 1400 && t < 5600 ? txt : t > 7600 ? ["ЧТО?!", "КАК?!", "НЕЧЕСТНО!", "ВАУ"][i] : null));
+    exSvg.querySelectorAll(".exSweat").forEach((s, i) => s.setAttribute("transform", `translate(0,${(t / 6 + i * 20) % 40})`));
+    const typing = t > 3000 && t < 6000;
+    $("exD").querySelector(".aL").setAttribute("transform", `translate(-66,-388) rotate(${typing ? -30 + Math.sin(t / 40) * 15 : 0})`);
+    $("exD").querySelector(".aR").setAttribute("transform", `translate(66,-388) rotate(${typing ? 30 - Math.cos(t / 40) * 15 : t > 6000 ? -160 : 0})`);
+    $("exScr").setAttribute("fill", typing ? ((t / 120 | 0) % 2 ? "#0b2" : "#ffd54a") : "#0b2");
+    $("exAns").setAttribute("opacity", t > 6000 ? 1 : 0);
+    $("exTMouth").setAttribute("d", t > 7000 ? "M-14 -440 a14 18 0 1 0 28 0 a14 18 0 1 0 -28 0" : "M-20 -440 H20");
+    const st = clamp01((t - 8600) / 300);
+    $("exStamp").setAttribute("opacity", st);
+    $("exStamp").setAttribute("transform", `translate(960,560) scale(${1 + (1 - st) * 2}) rotate(-12)`);
+  });
+}
+
 /* ---------- шоу ---------- */
 let busy = false, showCount = 0;
 // все варианты по очереди, каждый запускается ровно раз в минуту
 const VARIANTS = [
-  runFish,                                                                                 // золотая рыбка (новый — идёт первым)
+  runExam,                                                                                 // экзамен (новый — идёт первым)
+  runFish,                                                                                 // золотая рыбка
   runSpace,                                                                                // космос
   runRap,                                                                                  // рэп-баттл
   runNews,                                                                                 // срочные новости
