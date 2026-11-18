@@ -883,8 +883,8 @@
 
 <script>
 /* ======================= НАСТРОЙКИ ======================= */
-const EVERY_MS = 60000; // новый вариант каждую минуту
-const FIRST_MS = 60000; // первое шоу через минуту после загрузки
+const EVERY_MS = 120000; // новый вариант каждые 2 минуты
+const FIRST_MS = 120000; // первое шоу через 2 минуты после загрузки
 const STORY_MS = 16500; // Димон + качок
 const TEXT_MS  = 5500;  // "Димон PRO, а ты всё ещё гуглишь?"
 const TD_MS    = 13000; // tower defense
@@ -2659,11 +2659,68 @@ function runCook() {
   });
 }
 
+// --- 9. PRO-качалка ---
+const gySvg = svgPhase("gy");
+const barbell = (id, label, plate) => `<g id="${id}"><rect x="-330" y="-10" width="660" height="20" rx="8" fill="#9e9e9e" stroke="#000" stroke-width="4"/>
+  <rect x="-330" y="-90" width="70" height="180" rx="10" fill="${plate}" stroke="#000" stroke-width="5"/><rect x="260" y="-90" width="70" height="180" rx="10" fill="${plate}" stroke="#000" stroke-width="5"/>
+  <rect x="-260" y="-70" width="40" height="140" rx="8" fill="${plate}" stroke="#000" stroke-width="4"/><rect x="220" y="-70" width="40" height="140" rx="8" fill="${plate}" stroke="#000" stroke-width="4"/>
+  <text x="0" y="-30" text-anchor="middle" font-size="44" font-family="Impact" fill="#fff" stroke="#000" stroke-width="2">${label}</text></g>`;
+gySvg.innerHTML = `
+  <rect width="1920" height="1080" fill="#263238"/>
+  ${Array.from({ length: 8 }, (_, i) => `<rect x="${i * 260}" y="0" width="130" height="1080" fill="#fff" opacity=".02"/>`).join("")}
+  <rect x="0" y="940" width="1920" height="140" fill="#3e2723"/>
+  <text x="960" y="110" text-anchor="middle" font-size="90" font-family="Impact" fill="#ffd54a" stroke="#000" stroke-width="3">PRO-КАЧАЛКА 💪</text>
+  <rect x="160" y="320" width="560" height="140" rx="10" fill="#111" stroke="#ff1744" stroke-width="6"/>
+  <text id="gyScore" x="440" y="412" text-anchor="middle" font-size="64" font-family="Consolas, monospace" font-weight="900" fill="#ff1744">ВЕС: 0 кг</text>
+  <g id="gyWhale" transform="translate(500,940)">
+    <ellipse cx="0" cy="-90" rx="130" ry="85" fill="#4d6bfe" stroke="#000" stroke-width="5"/><path d="M-120 -100 L-180 -150 L-170 -60 Z" fill="#4d6bfe" stroke="#000" stroke-width="4"/>
+    <circle id="gyWEye" cx="60" cy="-115" r="12" fill="#fff"/><circle cx="62" cy="-113" r="5"/>
+    <path id="gyWMouth" d="M40 -70 Q70 -60 100 -70" stroke="#000" stroke-width="5" fill="none"/>
+    <text x="0" y="-195" text-anchor="middle" font-size="34" font-family="Impact" fill="#8fa5ff">DeepSeek</text>
+    <g id="gyBar1" transform="translate(0,-180)">${barbell("gyB1", "БЕСПЛАТНО", "#607d8b")}</g>
+  </g>
+  <g id="gyDimaG" transform="translate(1500,940)">${person({ id: "gyD", jacket: "#111", pants: "#1565c0", hair: "#3a2416", extra: `
+    <text x="0" y="-290" text-anchor="middle" font-size="44" font-family="Impact" fill="#ffd54a">PRO</text>
+    <rect x="-54" y="-500" width="108" height="26" rx="10" fill="#000"/>
+    <path d="M-22 -448 Q0 -432 24 -452" stroke="#000" stroke-width="5" fill="none"/>` })}
+    <g id="gyBi"><circle cx="-110" cy="-300" r="0" fill="#f1c39b" stroke="#000" stroke-width="4"/><circle cx="110" cy="-300" r="0" fill="#f1c39b" stroke="#000" stroke-width="4"/></g>
+    <g id="gyBar2" transform="translate(0,-560)" opacity="0">${barbell("gyB2", "ЛИМИТЫ ∞", "url(#gold)")}</g>
+  </g>
+  <g id="gyBub" opacity="0"><rect x="160" y="170" width="1000" height="110" rx="55" fill="#fff" stroke="#000" stroke-width="5"/>
+    <text id="gyTxt" x="660" y="242" text-anchor="middle" font-size="44" font-weight="900" font-family="Segoe UI, Arial" fill="#111"></text></g>
+  <text id="gyEnd" x="960" y="560" text-anchor="middle" font-size="76" font-family="Impact" fill="#fff" stroke="#000" stroke-width="4" opacity="0">Качаем не мышцы — качаем ТОКЕНЫ 💪</text>`;
+function runGym() {
+  show("gy");
+  const SAY = [[300, "DeepSeek: сейчас как подниму!.."], [2800, "DeepSeek: ...буль 😵"], [4300, "Димон: смотри, как надо 😎"], [9000, null]];
+  return anim(12000, t => {
+    let s = null; SAY.forEach(([a, x]) => { if (t >= a) s = x; }); $("gyBub").setAttribute("opacity", s ? 1 : 0); if (s) $("gyTxt").textContent = s;
+    // кит пытается и падает
+    const tryK = clamp01(t / 2400), fail = clamp01((t - 2400) / 400);
+    const by = -180 - Math.sin(tryK * Math.PI * 6) * 20 * (1 - fail) + fail * 120;
+    $("gyBar1").setAttribute("transform", `translate(${Math.sin(t / 40) * (1 - fail) * 6},${by}) rotate(${fail * 10})`);
+    $("gyWhale").setAttribute("transform", `translate(500,940) scale(1,${1 - fail * .45})`);
+    $("gyWMouth").setAttribute("d", fail ? "M40 -60 Q70 -80 100 -60" : "M40 -70 Q70 -60 100 -70");
+    // Димон поднимает
+    const lift = clamp01((t - 4800) / 1600), e = 1 - (1 - lift) ** 3;
+    $("gyBar2").setAttribute("opacity", t > 4300 ? 1 : 0);
+    $("gyBar2").setAttribute("transform", `translate(0,${lerp(-60, -700, e) + (lift >= 1 ? Math.sin(t / 150) * 10 : 0)})`);
+    const armA = lerp(0, 175, e);
+    $("gyD").querySelector(".aL").setAttribute("transform", `translate(-66,-388) rotate(${armA})`);
+    $("gyD").querySelector(".aR").setAttribute("transform", `translate(66,-388) rotate(${-armA})`);
+    [...$("gyBi").children].forEach(c => c.setAttribute("r", lift >= 1 ? 30 + Math.abs(Math.sin(t / 200)) * 12 : 0));
+    $("gyBi").setAttribute("transform", `translate(0,${-200})`);
+    const kg = t < 2400 ? Math.floor(tryK * 3) : t < 4800 ? 0 : Math.floor(e * 13000);
+    $("gyScore").textContent = lift >= 1 ? "ВЕС: ∞ кг" : `ВЕС: ${kg} кг`;
+    $("gyEnd").setAttribute("opacity", t > 9000 ? 1 : 0);
+  });
+}
+
 /* ---------- шоу ---------- */
 let busy = false, showCount = 0;
 // все варианты по очереди, каждый запускается ровно раз в минуту
 const VARIANTS = [
-  runCook,                                                                                 // кулинарное шоу (новый — идёт первым)
+  runGym,                                                                                  // качалка
+  runCook,                                                                                 // кулинарное шоу
   runExam,                                                                                 // экзамен
   runFish,                                                                                 // золотая рыбка
   runSpace,                                                                                // космос
@@ -2685,10 +2742,27 @@ const VARIANTS = [
   async () => { show("wc"); await runWC(); },                                             // туалет
   async () => { show("queue"); await runQueue(); },                                       // очередь
 ];
+// случайный порядок без повторов: «мешок» перемешанных вариантов; пока не покажутся все — ни один не повторится.
+// Мешок хранится в localStorage, чтобы после автообновления очередь не начиналась заново.
+let bagMem = null, lastMem = -1;
+function nextVariant() {
+  if (bagMem === null) { // один раз подхватываем сохранённую очередь (если localStorage доступен)
+    bagMem = [];
+    try { const st = JSON.parse(localStorage.getItem("dimonBag") || "{}"); if (st.n === VARIANTS.length) { bagMem = st.bag || []; lastMem = st.last ?? -1; } } catch (e) {}
+  }
+  if (!bagMem.length) {
+    bagMem = [...VARIANTS.keys()];
+    for (let i = bagMem.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [bagMem[i], bagMem[j]] = [bagMem[j], bagMem[i]]; }
+    if (bagMem[0] === lastMem && bagMem.length > 1) [bagMem[0], bagMem[1]] = [bagMem[1], bagMem[0]]; // не повторять последний на стыке кругов
+  }
+  lastMem = bagMem.shift();
+  try { localStorage.setItem("dimonBag", JSON.stringify({ n: VARIANTS.length, bag: bagMem, last: lastMem })); } catch (e) {}
+  return lastMem;
+}
 async function playShow() {
   if (busy) return; busy = true;
   stage.classList.add("on");
-  await VARIANTS[showCount++ % VARIANTS.length]();
+  await VARIANTS[nextVariant()]();
   stage.classList.remove("on");
   await sleep(450);
   show(null);
@@ -2702,7 +2776,7 @@ const JUST_UPDATED = new URLSearchParams(location.search).has("v");
   while (true) {
     const start = performance.now();
     await playShow();
-    await sleep(Math.max(0, EVERY_MS - (performance.now() - start))); // следующий — через минуту после начала этого
+    await sleep(Math.max(0, EVERY_MS - (performance.now() - start))); // следующий — через 2 минуты после начала этого
   }
 })();
 
