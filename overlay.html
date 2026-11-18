@@ -71,7 +71,7 @@
   .chibi .say.on { opacity: 1; }
 
   /* звонок эйчара */
-  #call { position: fixed; right: 1.5vw; top: 3vh; width: clamp(240px, 26vw, 500px); background: rgba(12, 14, 24, .95); border: 4px solid #4caf50; border-radius: 22px;
+  #call { position: fixed; right: 1.5vw; bottom: 3vh; width: clamp(240px, 26vw, 500px); background: rgba(12, 14, 24, .95); border: 4px solid #4caf50; border-radius: 22px;
           box-shadow: 0 0 30px rgba(76,175,80,.45); font-family: "Segoe UI", Arial, sans-serif; color: #fff; overflow: hidden; display: none; }
   #call.on { display: block; animation: pop .45s cubic-bezier(.2,1.6,.4,1) both; }
   #call.ring { animation: ringShake .12s infinite; border-color: #ffd54a; }
@@ -90,7 +90,7 @@
   @keyframes rise { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
 
   /* окно сериала справа */
-  #serial { position: fixed; right: 1.5vw; bottom: 3vh; width: clamp(240px, 24vw, 460px); height: 46vh; background: rgba(10, 12, 20, .9); border: 3px solid #607d8b;
+  #serial { position: fixed; right: 1.5vw; top: 3vh; width: clamp(240px, 24vw, 460px); height: 46vh; background: rgba(10, 12, 20, .9); border: 3px solid #607d8b;
             border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; font-family: "Segoe UI", Arial, sans-serif; box-shadow: 0 0 24px rgba(0,0,0,.5); }
   .sHead { padding: 1vh 1vw; background: #263238; color: #fff; font: 900 clamp(13px, 1.25vw, 24px) Impact, sans-serif; letter-spacing: .03em; }
   .sHead span { font: 700 .6em "Segoe UI", Arial; color: #ff5252; margin-left: .6vw; animation: led 1.4s steps(2) infinite; }
