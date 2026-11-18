@@ -112,6 +112,26 @@
   .bbTag { position: absolute; left: 50%; top: -1.2em; transform: translateX(-50%); background: #c62828; color: #fff; font: clamp(11px, 1vw, 18px) Impact, sans-serif;
            padding: 1px 12px; border: 2px solid #000; border-radius: 8px; z-index: 2; letter-spacing: .08em; }
 
+  /* мини-игра «Угадай бренд» */
+  #game { position: fixed; inset: 0; pointer-events: none; z-index: 4; }
+  .gc { position: absolute; left: 0; top: 0; width: auto; border-radius: 12px !important; min-width: clamp(54px, 4vw, 80px); padding: .4vh .5vw; box-sizing: border-box; text-align: center; background: rgba(255,255,255,.93);
+        border: 3px solid #000; border-radius: 16px; box-shadow: 0 6px 0 rgba(0,0,0,.35); will-change: transform; }
+  .gc .ge { font-size: clamp(20px, 1.8vw, 34px); line-height: 1.1; }
+  .gc .gh { font: 900 clamp(10px, .8vw, 15px)/1.1 Consolas, "Courier New", monospace; color: #222; letter-spacing: .08em; white-space: nowrap; }
+  .gc .gn { display: none; font: clamp(11px, .9vw, 17px) Impact, sans-serif; color: #2e7d32; white-space: nowrap; }
+  .gc.won { border-color: #2e7d32; background: #e8f5e9; animation: gWin .9s ease-in forwards; }
+  .gc.won .gh { display: none; } .gc.won .gn { display: block; }
+  .gc.miss { animation: gMiss .8s ease-in forwards; } .gc.miss .gh { display: none; } .gc.miss .gn { display: block; color: #c62828; }
+  @keyframes gWin { 0% { transform: var(--p) scale(1); } 30% { transform: var(--p) scale(1.35) rotate(-8deg); } 100% { transform: var(--p) scale(0) rotate(30deg); opacity: 0; } }
+  @keyframes gMiss { to { transform: var(--p) translateY(40px); opacity: 0; } }
+  #gPanel { position: fixed; left: 1.5vw; bottom: 2.5vh; width: clamp(200px, 22vw, 420px); background: rgba(10,12,20,.92); border: 3px solid #ff4fd8; border-radius: 16px;
+            color: #fff; font-family: "Segoe UI", Arial, sans-serif; overflow: hidden; z-index: 3; }
+  #gPanel .gt { background: #4a148c; padding: .7vh .8vw; font: clamp(12px, 1.1vw, 20px) Impact, sans-serif; display: flex; justify-content: space-between; }
+  #gPanel .gt span { color: #ffd54a; font-family: Consolas, monospace; }
+  #gLast { padding: .5vh .8vw; font: 800 clamp(11px, .95vw, 17px) "Segoe UI", Arial; color: #7dffb0; min-height: 1.3em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #gTop { padding: 0 .8vw .7vh; font: 700 clamp(10px, .9vw, 16px)/1.35 "Segoe UI", Arial; }
+  #gTop div { display: flex; justify-content: space-between; } #gTop b { color: #ffd54a; }
+
   /* окно сериала справа */
   #serial { position: fixed; right: 1.5vw; top: 3vh; width: clamp(240px, 24vw, 460px); height: 46vh; background: rgba(10, 12, 20, .9); border: 3px solid #607d8b;
             border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; font-family: "Segoe UI", Arial, sans-serif; box-shadow: 0 0 24px rgba(0,0,0,.5); }
@@ -140,6 +160,8 @@
 <div id="crt"><div class="crtCase"><div class="crtScreen"><div id="crtText"></div></div><div class="crtLed"></div></div></div>
 <div id="bb"><div class="bbTag">📺 PRO TV</div><div class="bbFrame"><iframe id="bbFrame" src="cartoons.html?billboard" title="PRO TV" scrolling="no"></iframe></div><div class="bbLights"></div></div>
 <div id="agents"></div>
+<div id="game"></div>
+<div id="gPanel"><div class="gt">🎯 УГАДАЙ БРЕНД — пиши в чат! <span id="gTimer">0:60</span></div><div id="gLast">Пиши название бренда по подсказке</div><div id="gTop"></div></div>
 <div id="call"></div>
 <div id="serial"><div class="sHead">📺 «ПОДВАЛ №13» <span>● в эфире</span></div><div id="serialLog"></div></div>
 <div id="dolphin"><div id="dlNick"></div><svg viewBox="0 0 200 110" width="100%">
@@ -234,6 +256,14 @@ const params = new URLSearchParams(location.search);
 const TEST = params.has("test");
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+/* ---------- память между перезагрузками (обновления не сбрасывают циклы) ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("dimon_" + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("dimon_" + k, JSON.stringify(v)); } catch (e) {} },
+};
+// детерминированный генератор случайных чисел (одно и то же «зерно» = одна и та же последовательность)
+function seeded(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
 const status = txt => { if (TEST) { $("status").style.display = "block"; $("status").textContent = txt; } };
 
 /* ---------- мемы про ник (связаны с нейронками) ---------- */
@@ -350,6 +380,7 @@ function connect() {
       const who = tags["display-name"] || m[2];
       if (IGNORE.includes(who.toLowerCase())) return;
       try { dolphinKick(who); } catch (e) {}
+      try { gameGuess(who, text); } catch (e) {}
       if (CHAT_ON) enqueue(who, tags.color || "", text);
     });
   };
@@ -486,7 +517,7 @@ function nextPrompt() {
     $("bxCode").setAttribute("transform", `translate(0,${132 - 56 + ((t / 25) % 56)})`);
     screenLines.forEach((l, i) => l.setAttribute("width", 20 + Math.abs(Math.sin(t / 300 + i)) * 55));
     // цикл минуты: сидит → отходит → танцует → возвращается
-    const c = t % DANCE_EVERY_MS, D0 = DANCE_EVERY_MS - DANCE_MS - 2000, WALK = 1000;
+    const c = Date.now() % DANCE_EVERY_MS, D0 = DANCE_EVERY_MS - DANCE_MS - 2000, WALK = 1000;
     const dancing = c >= D0;
     sit.setAttribute("display", dancing ? "none" : "inline");
     st.setAttribute("display", dancing ? "inline" : "none");
@@ -524,7 +555,7 @@ function nextPrompt() {
   const nextDance = () => { if (!danceBag.length) danceBag = [...DANCE_LINES].sort(() => Math.random() - .5); return danceBag.shift(); };
   async function speak() {
     if (window.dimaOnCall) return; // во время звонка эйчара промты не пишет
-    const c = (performance.now() - t0) % DANCE_EVERY_MS, dancing = c >= DANCE_EVERY_MS - DANCE_MS - 2000;
+    const c = Date.now() % DANCE_EVERY_MS, dancing = c >= DANCE_EVERY_MS - DANCE_MS - 2000;
     const box = $("box").getBoundingClientRect(), p = $("prompt");
     const line = dancing ? nextDance() : nextPrompt();
     p.innerHTML = dancing ? esc(line) : `<b>&gt; GPT:</b> ${esc(line)}`;
@@ -642,7 +673,12 @@ function runChibi([name, col], idx) {
   });
 }
 async function agentsWave() { const n = 2 + (Math.random() * 3 | 0); await Promise.all(pickAgents(n).map((a, i) => runChibi(a, i))); }
-setTimeout(() => { agentsWave(); setInterval(agentsWave, AGENTS_EVERY_MS); }, AGENTS_FIRST_MS);
+(function agentsTick() {
+  let next = store.get("nextAgents", 0);
+  if (!next || next > Date.now() + AGENTS_EVERY_MS) { next = Date.now() + AGENTS_FIRST_MS; store.set("nextAgents", next); }
+  if (Date.now() >= next) { store.set("nextAgents", Date.now() + AGENTS_EVERY_MS); agentsWave(); }
+  setTimeout(agentsTick, 1000);
+})();
 
 /* ---------- билборд: масштабируем мультики 1920×1080 под размер рамки ---------- */
 function fitBillboard() { const f = $("bbFrame"); if (!f) return; f.style.transform = `scale(${f.parentElement.clientWidth / 1920})`; }
@@ -833,7 +869,8 @@ const G = {
   titles: ["ТАБУРЕТКА", "ПЕРЕКЛИЧКА", "НОЧНОЕ ДЕЖУРСТВО", "РОЗЕТКА", "СЕКРЕТНЫЙ ПРОМПТ", "ЗАВТРАК", "ПРОВЕРКА", "КРЫСА НА ПРЕМИУМЕ", "ВЕДРО", "ТИШИНА",
     "ПОДПИСКА", "ДИМОН НА СВЯЗИ", "ЛАМПОЧКА", "ЗАГАДКА СЕРВЕРА", "ГЕНЕРАЛЬНАЯ УБОРКА", "КАСТРЮЛЯ", "ДОКЛАД", "ПЯТНИЦА", "ТОКЕН", "СОН ЛИМИТОВА"],
 };
-const pick = arr => arr[Math.random() * arr.length | 0];
+let serialRng = Math.random;
+const pick = arr => arr[serialRng() * arr.length | 0];
 const EXCH = [
   () => [["Лимитов", `Токенов, а ${pick(G.thing)} бывает на премиуме?`], ["Токенов", "В этом подвале всё бывает."], ["Лимитов", "Даже пельмени?"], ["Токенов", "Особенно пельмени."]],
   () => [["Капитан PRO", `ОТСТАВИТЬ РАЗГОВОРЫ ПРО ${pick(G.food).toUpperCase()}!`], ["Лимитов", "А когда можно?"], ["Капитан PRO", `ТОЛЬКО ПО ${pick(G.day).toUpperCase()}!`]],
@@ -864,14 +901,24 @@ function genEpisode(n) {
   const out = [["—", `СЕРИЯ ${n}. «${pick(G.titles)}»`]];
   const used = new Set();
   while (out.length < 26) {
-    let k; do { k = Math.random() * EXCH.length | 0; } while (used.has(k) && used.size < EXCH.length); used.add(k);
+    let k; do { k = serialRng() * EXCH.length | 0; } while (used.has(k) && used.size < EXCH.length); used.add(k);
     EXCH[k]().forEach(l => out.push([l[0], String(l[1]).replace("{T}", pick(G.thing))]));
   }
   return out;
 }
+const serialHourCache = {};
+function serialHour(h) { // весь сезон на час — один и тот же для одного часа
+  if (serialHourCache[h]) return serialHourCache[h];
+  serialRng = seeded(h * 31 + 7);
+  const total = SERIAL_CYCLE_MS / SERIAL_LINE_MS;
+  let seq = [...SERIAL.slice(0, -1)], ep = 4;
+  while (seq.length < total - 1) seq.push(...genEpisode(++ep));
+  seq = seq.slice(0, total - 1); seq.push(["—", "КОНЕЦ СЕЗОНА. Сейчас всё сначала 🙂"]);
+  serialRng = Math.random;
+  return (serialHourCache[h] = seq);
+}
 (() => {
   const log = $("serialLog");
-  let queue = [...SERIAL.slice(0, -1)], ep = 4, start = performance.now();
   function show(who, text) {
     const row = document.createElement("div");
     if (who === "—") { row.className = "sr title"; row.textContent = text; }
@@ -879,20 +926,173 @@ function genEpisode(n) {
     log.appendChild(row);
     while (log.children.length > 9) log.firstChild.remove();
   }
-  function next() {
-    if (!queue.length) {
-      if (performance.now() - start >= SERIAL_CYCLE_MS) {
-        show("—", "КОНЕЦ СЕЗОНА. Сейчас всё сначала 🙂");
-        queue = [...SERIAL.slice(0, -1)]; ep = 4; start = performance.now() + 15000;
-        return setTimeout(next, 15000);
-      }
-      queue = genEpisode(++ep);
-    }
-    const [who, text] = queue.shift();
-    show(who, text);
-    setTimeout(next, who === "—" ? 3500 : SERIAL_LINE_MS);
+  const pos = t => { const h = Math.floor(t / SERIAL_CYCLE_MS); return { h, i: Math.floor((t % SERIAL_CYCLE_MS) / SERIAL_LINE_MS) }; };
+  // при загрузке сразу показываем последние реплики — как будто сериал шёл всё это время
+  let { h, i } = pos(Date.now());
+  const seq = serialHour(h);
+  for (let k = Math.max(0, i - 7); k <= i; k++) show(...seq[k]);
+  let lastKey = h + ":" + i;
+  (function tick() {
+    const p = pos(Date.now()), key = p.h + ":" + p.i;
+    if (key !== lastKey) { lastKey = key; show(...serialHour(p.h)[p.i]); }
+    setTimeout(tick, 500);
+  })();
+})();
+
+/* ---------- мини-игра «Угадай бренд»: 7 карточек в минуту, чат пишет название ---------- */
+// Логотипы не рисуем — только смайлик и подсказка-загадка. Алиасы — варианты написания.
+const BRANDS = [
+  ["McDonald's", "🍔", "жёлтая буква «М» на красном", ["макдональдс", "макдак", "mcdonalds", "макдоналдс", "мак"]],
+  ["Burger King", "👑", "король бургеров", ["бургер кинг", "burger king", "бургеркинг", "бк"]],
+  ["KFC", "🍗", "дедушка в очках и курица в ведре", ["kfc", "кфс", "кфц", "кейэфси"]],
+  ["Вкусно и точка", "🍟", "две картошки и точка", ["вкусно и точка", "вкусноиточка"]],
+  ["Starbucks", "☕", "зелёная русалка на стакане", ["starbucks", "старбакс", "старбаксе"]],
+  ["Coca-Cola", "🥤", "красная газировка с белыми завитушками", ["coca cola", "кока кола", "кока-кола", "кола", "cocacola"]],
+  ["Pepsi", "🥤", "сине-красно-белый круг, газировка", ["pepsi", "пепси"]],
+  ["Nike", "👟", "одна большая галочка", ["nike", "найк", "найки"]],
+  ["Adidas", "👟", "три полоски", ["adidas", "адидас"]],
+  ["Puma", "🐆", "прыгающая кошка", ["puma", "пума"]],
+  ["IKEA", "🛋", "шведская мебель, синий с жёлтым", ["ikea", "икеа", "икея"]],
+  ["Apple", "🍎", "надкусанный фрукт", ["apple", "эпл", "эппл", "айфон", "яблоко"]],
+  ["Samsung", "📱", "синий овал, корейская техника", ["samsung", "самсунг"]],
+  ["LEGO", "🧱", "красный квадрат, кубики-конструктор", ["lego", "лего"]],
+  ["Toyota", "🚗", "три овала, японские машины", ["toyota", "тойота"]],
+  ["BMW", "🚗", "сине-белый круг из Баварии", ["bmw", "бмв", "бэха", "бумер"]],
+  ["Mercedes", "🚘", "трёхлучевая звезда в круге", ["mercedes", "мерседес", "мерс"]],
+  ["Audi", "🚘", "четыре кольца", ["audi", "ауди"]],
+  ["Lada", "🚙", "кораблик с парусом, наши машины", ["lada", "лада", "жигули"]],
+  ["Ferrari", "🐎", "чёрный вставший конь на жёлтом", ["ferrari", "феррари"]],
+  ["Lamborghini", "🐂", "золотой бык на чёрном щите", ["lamborghini", "ламборгини", "ламба", "ламборджини"]],
+  ["Tesla", "⚡", "буква T как щит, электромашины", ["tesla", "тесла"]],
+  ["Shell", "⛽", "жёлтая ракушка, заправка", ["shell", "шелл", "шел"]],
+  ["Пятёрочка", "🛒", "красная цифра 5, магазин у дома", ["пятерочка", "пятёрочка", "5ка"]],
+  ["Магнит", "🧲", "красный магнит, супермаркет", ["магнит"]],
+  ["Сбер", "💚", "зелёная галочка в круге, банк", ["сбер", "сбербанк", "sber"]],
+  ["Яндекс", "🔍", "красная буква «Я»", ["яндекс", "yandex"]],
+  ["ВКонтакте", "💬", "синие буквы VK, соцсеть", ["вконтакте", "вк", "vk", "контакт"]],
+  ["Telegram", "✈️", "бумажный самолётик в синем круге", ["telegram", "телеграм", "телега", "тг"]],
+  ["YouTube", "▶️", "красная кнопка play", ["youtube", "ютуб", "ютьюб"]],
+  ["Twitch", "💜", "фиолетовый пузырь с глазками-палочками", ["twitch", "твич"]],
+  ["Netflix", "🎬", "красная буква N, сериалы", ["netflix", "нетфликс"]],
+  ["Spotify", "🎧", "зелёный круг с тремя волнами", ["spotify", "спотифай"]],
+  ["Instagram", "📸", "камера в разноцветном градиенте", ["instagram", "инстаграм", "инста", "инстаграмм"]],
+  ["TikTok", "🎵", "нота с голубым и красным", ["tiktok", "тикток", "тик ток"]],
+  ["Google", "🌈", "разноцветная буква G", ["google", "гугл"]],
+  ["Microsoft", "🪟", "четыре цветных квадрата", ["microsoft", "майкрософт", "микрософт"]],
+  ["PlayStation", "🎮", "треугольник, круг, крестик, квадрат", ["playstation", "плейстейшн", "плойка", "ps", "пс"]],
+  ["Xbox", "🎮", "зелёный шар с крестиком", ["xbox", "иксбокс", "хбокс"]],
+  ["Nintendo", "🎮", "красный овал, японские консоли", ["nintendo", "нинтендо"]],
+  ["Lacoste", "🐊", "зелёный крокодил на рубашке", ["lacoste", "лакост", "лакоста"]],
+  ["Gucci", "👜", "две переплетённые буквы G", ["gucci", "гуччи", "гучи"]],
+  ["Louis Vuitton", "👜", "буквы L и V, дорогие сумки", ["louis vuitton", "луи виттон", "луи витон", "lv"]],
+  ["Zara", "👗", "четыре буквы, испанская одежда", ["zara", "зара"]],
+  ["H&M", "👕", "две буквы и знак «&»", ["h&m", "hm", "эйч энд эм", "ашэм"]],
+  ["Supreme", "🧢", "красная плашка с белым словом", ["supreme", "суприм", "сюприм"]],
+  ["Red Bull", "🐂", "два быка и солнце, энергетик", ["red bull", "редбул", "ред булл", "редбулл"]],
+  ["Doritos", "🌮", "треугольник, острые чипсы", ["doritos", "доритос"]],
+  ["Lay's", "🥔", "жёлтое солнышко на пачке чипсов", ["lays", "лейс", "лэйс"]],
+  ["Pringles", "🥫", "усатый дядька на тубе", ["pringles", "принглс"]],
+  ["Nutella", "🍫", "чёрная N и красные буквы, паста", ["nutella", "нутелла", "нутела"]],
+  ["Kinder", "🥚", "шоколадное яйцо с игрушкой", ["kinder", "киндер"]],
+  ["Snickers", "🍫", "сине-красная шоколадка с орехами", ["snickers", "сникерс"]],
+  ["Domino's", "🍕", "костяшка домино, пицца", ["dominos", "доминос", "домино"]],
+  ["Додо Пицца", "🍕", "птичка-додо, пицца", ["додо", "dodo", "додо пицца"]],
+  ["Subway", "🥪", "стрелочки на буквах, сэндвичи", ["subway", "сабвей"]],
+  ["Wildberries", "🛍", "фиолетовый маркетплейс", ["wildberries", "вайлдберриз", "валдбериз", "вб", "вилдберис"]],
+  ["Ozon", "📦", "синий маркетплейс", ["ozon", "озон"]],
+  ["Аэрофлот", "✈️", "крылья с серпом и молотом", ["аэрофлот", "aeroflot"]],
+  ["Chupa Chups", "🍭", "ромашка на чупике", ["chupa chups", "чупа чупс", "чупачупс", "чупик"]],
+];
+const normT = s => String(s).toLowerCase().replace(/ё/g, "е").replace(/[^a-zа-я0-9&\s]/g, " ").replace(/\s+/g, " ").trim();
+function lev(a, b) {
+  const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
+  // расстояние с учётом перестановки соседних букв (nkie → nike = 1 ошибка)
+  const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+  for (let j = 0; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+    const c = a[i - 1] === b[j - 1] ? 0 : 1;
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
   }
-  setTimeout(next, 2000);
+  return d[m][n];
+}
+// засчитываем, если похоже: точное слово, или опечатка в 1–2 буквы (по длине), или совпадение фразой
+function matches(msg, alias) {
+  const m = normT(msg), a = normT(alias); if (!m || !a) return false;
+  const nospace = s => s.replace(/\s/g, "");
+  if (a.length <= 2) return m.split(" ").includes(a);
+  if ((" " + m + " ").includes(" " + a + " ") || nospace(m).includes(nospace(a))) return true;
+  const allow = a.length <= 4 ? 1 : a.length <= 8 ? 2 : 3;
+  const words = m.split(" ");
+  for (let i = 0; i < words.length; i++) for (let k = 1; k <= 3 && i + k <= words.length; k++) {
+    const chunk = words.slice(i, i + k).join("");
+    if (Math.abs(chunk.length - nospace(a).length) <= allow && lev(chunk, nospace(a)) <= allow) return true;
+  }
+  return false;
+}
+const GAME_ROUND_MS = 60000, GAME_PER_ROUND = 7;
+const BRAND_ORDER = (() => { const r = seeded(777), o = [...BRANDS.keys()]; for (let i = o.length - 1; i > 0; i--) { const j = r() * (i + 1) | 0; [o[i], o[j]] = [o[j], o[i]]; } return o; })();
+let gameCards = [], gameRound = -1;
+let gameTop = store.get("gameTop", {});
+function renderTop() {
+  const top = Object.entries(gameTop).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  $("gTop").innerHTML = top.length ? top.map(([n, c], i) => `<div><span>${["🥇", "🥈", "🥉", "4.", "5."][i]} ${esc(n)}</span><b>${c}</b></div>`).join("") : "<div><span>пока никто не угадал</span></div>";
+}
+function startRound(round) {
+  gameRound = round;
+  gameCards.forEach(c => { if (!c.done) { c.el.classList.add("miss"); setTimeout(() => c.el.remove(), 800); } });
+  const saved = store.get("gameRound", {});
+  const guessed = saved.round === round ? saved.ids || [] : [];
+  const r = seeded(round * 97 + 13);
+  gameCards = [];
+  for (let k = 0; k < GAME_PER_ROUND; k++) {
+    const id = BRAND_ORDER[(round * GAME_PER_ROUND + k) % BRAND_ORDER.length];
+    if (guessed.includes(id)) continue;
+    const [name, emo] = BRANDS[id];
+    const hint = [...name].map((ch, i) => i === 0 ? ch.toUpperCase() : /[\s&'-]/.test(ch) ? ch : "_").join("");
+    const el = document.createElement("div");
+    el.className = "gc";
+    el.innerHTML = `<div class="ge">${emo}</div><div class="gh">${esc(hint)}</div><div class="gn">${esc(name)}</div>`;
+    $("game").appendChild(el);
+    gameCards.push({ id, el, x: 0.3 + r() * 0.4, y: 0.12 + r() * 0.6, a: r() * Math.PI * 2, sp: .0009 + r() * .0007, done: false });
+  }
+  if (saved.round !== round) store.set("gameRound", { round, ids: [] });
+}
+function gameGuess(nick, text) {
+  for (const c of gameCards) {
+    if (c.done) continue;
+    if (BRANDS[c.id][3].some(a => matches(text, a)) || matches(text, BRANDS[c.id][0])) {
+      c.done = true;
+      c.el.classList.add("won");
+      setTimeout(() => c.el.remove(), 950);
+      gameTop[nick] = (gameTop[nick] || 0) + 1; store.set("gameTop", gameTop); renderTop();
+      const st = store.get("gameRound", { round: gameRound, ids: [] }); st.round = gameRound; st.ids = [...(st.ids || []), c.id]; store.set("gameRound", st);
+      $("gLast").textContent = `✔ ${nick} угадал: ${BRANDS[c.id][0]} (+1)`;
+      return true;
+    }
+  }
+  return false;
+}
+(() => {
+  renderTop();
+  (function f() {
+    const now = Date.now(), round = Math.floor(now / GAME_ROUND_MS);
+    if (round !== gameRound) startRound(round);
+    const left = Math.ceil((GAME_ROUND_MS - now % GAME_ROUND_MS) / 1000);
+    $("gTimer").textContent = `0:${String(left).padStart(2, "0")}`;
+    const W = innerWidth, H = innerHeight;
+    gameCards.forEach((c, i) => {
+      if (c.done) return;
+      c.a += (Math.random() - .5) * .05;
+      c.x += Math.cos(c.a) * c.sp; c.y += Math.sin(c.a) * c.sp;
+      if (c.x < .02 || c.x > .9) { c.a = Math.PI - c.a; c.x = Math.max(.02, Math.min(.9, c.x)); }
+      if (c.y < .02 || c.y > .82) { c.a = -c.a; c.y = Math.max(.02, Math.min(.82, c.y)); }
+      const p = `translate(${c.x * W}px,${c.y * H}px)`;
+      c.el.style.setProperty("--p", p);
+      c.el.style.transform = `${p} rotate(${Math.sin(Date.now() / 600 + i) * 6}deg)`;
+    });
+    requestAnimationFrame(f);
+  })();
 })();
 
 /* ---------- звонки эйчаров: раз в 10 минут, собес ~2 минуты, Дима отказывается ---------- */
@@ -973,7 +1173,12 @@ async function hrCall() {
   window.dimaOnCall = false;
   $("bxPhone").setAttribute("display", "none");
 }
-setTimeout(() => { hrCall(); setInterval(hrCall, CALL_EVERY_MS); }, CALL_FIRST_MS);
+(function callTick() {
+  let next = store.get("nextCall", 0);
+  if (!next || next > Date.now() + CALL_EVERY_MS) { next = Date.now() + CALL_FIRST_MS; store.set("nextCall", next); }
+  if (Date.now() >= next && !window.dimaOnCall) { store.set("nextCall", Date.now() + CALL_EVERY_MS); hrCall(); }
+  setTimeout(callTick, 1000);
+})();
 
 /* ---------- автообновление: новая версия подхватывается сама, ссылка в OBS та же ---------- */
 let myVersion = null;

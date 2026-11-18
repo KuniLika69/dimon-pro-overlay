@@ -2797,8 +2797,11 @@ const BILLBOARD_GAP_MS = 10000;
 if (BILLBOARD) {
   (async () => {
     await sleep(1000);
-    for (let i = 0; ; i = (i + 1) % FIRST_PASS.length) {
+    let i = 0; try { i = (+localStorage.getItem("dimon_bbIdx") || 0) % FIRST_PASS.length; } catch (e) {}
+    for (; ; i = (i + 1) % FIRST_PASS.length) {
+      try { localStorage.setItem("dimon_bbIdx", String(i)); } catch (e) {} // после обновления продолжит с этого мультика
       await playShow(FIRST_PASS[i]);
+      try { localStorage.setItem("dimon_bbIdx", String((i + 1) % FIRST_PASS.length)); } catch (e) {}
       await sleep(BILLBOARD_GAP_MS);
     }
   })();
