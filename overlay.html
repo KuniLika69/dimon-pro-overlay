@@ -119,7 +119,7 @@
   .gc .ge { font-size: clamp(20px, 1.8vw, 34px); line-height: 1.1; }
   .gc .gh { font: 900 clamp(10px, .8vw, 15px)/1.1 Consolas, "Courier New", monospace; color: #222; letter-spacing: .08em; white-space: nowrap; }
   .gc .gn { display: none; font: clamp(11px, .9vw, 17px) Impact, sans-serif; color: #2e7d32; white-space: nowrap; }
-  .gc.won { border-color: #2e7d32; background: #e8f5e9; animation: gWin .9s ease-in forwards; }
+  .gc.won { border-color: #39ff14; box-shadow: 0 0 20px #39ff14; animation: gWin .9s ease-in forwards; }
   .gc.won .gh { display: none; } .gc.won .gn { display: block; }
   .gc.miss { animation: gMiss .8s ease-in forwards; } .gc.miss .gh { display: none; } .gc.miss .gn { display: block; color: #c62828; }
   @keyframes gWin { 0% { transform: var(--p) scale(1); } 30% { transform: var(--p) scale(1.35) rotate(-8deg); } 100% { transform: var(--p) scale(0) rotate(30deg); opacity: 0; } }
@@ -1003,6 +1003,22 @@ const BRANDS = [
   ["Аэрофлот", "✈️", "крылья с серпом и молотом", ["аэрофлот", "aeroflot"]],
   ["Chupa Chups", "🍭", "ромашка на чупике", ["chupa chups", "чупа чупс", "чупачупс", "чупик"]],
 ];
+// фирменные цвета (только цвета, без логотипов): [фон, текст]
+const BRAND_COLORS = {
+  "McDonald's": ["#da291c", "#ffc72c"], "Burger King": ["#f5ebdc", "#d62300"], "KFC": ["#a3080c", "#fff"], "Вкусно и точка": ["#173f35", "#ffb400"],
+  "Starbucks": ["#00704a", "#fff"], "Coca-Cola": ["#f40009", "#fff"], "Pepsi": ["#004b93", "#fff"], "Nike": ["#111", "#fff"], "Adidas": ["#000", "#fff"],
+  "Puma": ["#111", "#fff"], "IKEA": ["#0058a3", "#ffdb00"], "Apple": ["#f5f5f7", "#111"], "Samsung": ["#1428a0", "#fff"], "LEGO": ["#d01012", "#ffcf00"],
+  "Toyota": ["#eb0a1e", "#fff"], "BMW": ["#1c69d4", "#fff"], "Mercedes": ["#222", "#c0c0c0"], "Audi": ["#111", "#e5e5e5"], "Lada": ["#0b2a5b", "#fff"],
+  "Ferrari": ["#ffeb00", "#d40000"], "Lamborghini": ["#111", "#d4af37"], "Tesla": ["#cc0000", "#fff"], "Shell": ["#ffd500", "#dd1d21"],
+  "Пятёрочка": ["#e31e24", "#fff"], "Магнит": ["#e30613", "#fff"], "Сбер": ["#21a038", "#fff"], "Яндекс": ["#fc3f1d", "#fff"], "ВКонтакте": ["#0077ff", "#fff"],
+  "Telegram": ["#27a7e7", "#fff"], "YouTube": ["#ff0000", "#fff"], "Twitch": ["#9146ff", "#fff"], "Netflix": ["#000", "#e50914"], "Spotify": ["#1db954", "#000"],
+  "Instagram": ["#c13584", "#fff"], "TikTok": ["#000", "#25f4ee"], "Google": ["#fff", "#4285f4"], "Microsoft": ["#f3f3f3", "#737373"], "PlayStation": ["#003791", "#fff"],
+  "Xbox": ["#107c10", "#fff"], "Nintendo": ["#e60012", "#fff"], "Lacoste": ["#fff", "#004526"], "Gucci": ["#1b1b1b", "#c9a66b"], "Louis Vuitton": ["#5c3a21", "#e0c68a"],
+  "Zara": ["#fff", "#000"], "H&M": ["#fff", "#e50010"], "Supreme": ["#ed1c24", "#fff"], "Red Bull": ["#1e2a57", "#ffcc00"], "Doritos": ["#d81e05", "#fff"],
+  "Lay's": ["#ffd200", "#d7141a"], "Pringles": ["#d71920", "#fff"], "Nutella": ["#fff", "#e31b23"], "Kinder": ["#fff", "#e30613"], "Snickers": ["#3d1d0c", "#fff"],
+  "Domino's": ["#006491", "#fff"], "Додо Пицца": ["#ff6900", "#fff"], "Subway": ["#008938", "#ffc600"], "Wildberries": ["#cb11ab", "#fff"], "Ozon": ["#005bff", "#fff"],
+  "Аэрофлот": ["#00256c", "#fff"], "Chupa Chups": ["#ffd700", "#e2001a"],
+};
 const normT = s => String(s).toLowerCase().replace(/ё/g, "е").replace(/[^a-zа-я0-9&\s]/g, " ").replace(/\s+/g, " ").trim();
 function lev(a, b) {
   const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
@@ -1052,7 +1068,9 @@ function startRound(round) {
     const hint = [...name].map((ch, i) => i === 0 ? ch.toUpperCase() : /[\s&'-]/.test(ch) ? ch : "_").join("");
     const el = document.createElement("div");
     el.className = "gc";
-    el.innerHTML = `<div class="ge">${emo}</div><div class="gh">${esc(hint)}</div><div class="gn">${esc(name)}</div>`;
+    const [bg, fg] = BRAND_COLORS[name] || ["#fff", "#222"];
+    el.style.background = bg; el.style.setProperty("--fg", fg);
+    el.innerHTML = `<div class="ge">${emo}</div><div class="gh" style="color:${fg}">${esc(hint)}</div><div class="gn" style="color:${fg}">${esc(name)}</div>`;
     $("game").appendChild(el);
     gameCards.push({ id, el, x: 0.3 + r() * 0.4, y: 0.12 + r() * 0.6, a: r() * Math.PI * 2, sp: .0009 + r() * .0007, done: false });
   }
